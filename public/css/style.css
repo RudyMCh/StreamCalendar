@@ -1,0 +1,100 @@
+body{
+    background-color: white;
+}
+/* nous ciblons chacun des titres pour appliquer couleur bleue et centrage du texte, et police personnalisée */
+h1, h2, h3, h4, h5, h6{
+    color: blue;
+    text-align:center;
+    font-family: "Pacifico-Regular";
+}
+
+/* on cible les éléments ayant la classe active pour highlighter le menu en cours */
+.navbar-light .navbar-nav .active > .nav-link, .navbar-light .navbar-nav .nav-link.active, .navbar-light .navbar-nav .nav-link.show, .navbar-light .navbar-nav .show > .nav-link{
+    color : #FFFF;
+    font-weight: bold;
+}
+
+#carrou {
+    width : 80%;
+    height: 100vh;
+}
+body,html{
+    height:100%;
+    margin: 0;
+	padding: 0;
+}
+/* conteneur pour forcer le footer en bas de la page */
+.pageperso{
+    width: 80%;
+    margin: 0 auto;
+    min-height: 100%;
+}
+footer{
+    min-height: 40px;
+    width:100%;
+    bottom:0; left:0;
+    color : white;
+}
+
+h1{
+    color: deepskyblue;
+}
+/*
+style pour le calendrier*/
+
+
+
+/* The Modal (background) */
+.modal {
+    display: block; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    min-height:30em;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.streamCalendar{
+    background-color: orange;
+    border-radius: 8px;
+}
+.fc-today {
+    background:none !important;
+    border: none !important;
+    border-top: 1px solid #ddd !important;
+    font-weight: bold;
+}
+
+table .table-bordered{
+    border-top-left-radius: 15px 8px;
+    border-top-right-radius: 15px 8px;
+}
