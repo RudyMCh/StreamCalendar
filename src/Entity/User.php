@@ -63,6 +63,21 @@ class User
      */
     private $favorite;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $twitchId;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $profilImage;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $inProcess;
+
     public function __construct()
     {
         $this->events = new ArrayCollection();
@@ -216,6 +231,42 @@ class User
                 $favorite->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTwitchId(): ?int
+    {
+        return $this->twitchId;
+    }
+
+    public function setTwitchId(?int $twitchId): self
+    {
+        $this->twitchId = $twitchId;
+
+        return $this;
+    }
+
+    public function getProfilImage(): ?string
+    {
+        return $this->profilImage;
+    }
+
+    public function setProfilImage(?string $profilImage): self
+    {
+        $this->profilImage = $profilImage;
+
+        return $this;
+    }
+
+    public function getInProcess(): ?int
+    {
+        return $this->inProcess;
+    }
+
+    public function setInProcess(int $inProcess): self
+    {
+        $this->inProcess = $inProcess;
 
         return $this;
     }
