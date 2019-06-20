@@ -10,6 +10,17 @@
 <h1 class="text-center">mon calendrier</h1>
     
 
+    <div>
+        <form id="favoriteStreamer" class="form-group">
+            <input class="typeahead form-control" type="text" placeholder="Streamer">
+            <input type="submit" class="btn btn-primary" value="ajouter">
+        </form>
+    </div>
+    <h2 class="text-center">mes streamers favoris</h2>
+
+    <div>
+
+    </div>
 
 <div class="info"></div>
 <div class="container">
@@ -18,11 +29,13 @@
 
 <div></div>
 </div>
+{{ dump(streamerList|json_encode) }}
 {% endblock %}
 
 {% block javascripts %}
     <script>
-        var targetExtract = '{{ url('extract') }}';       
+        var extractFavoritesEvents = '{{ url('extractFavoritesEvents') }}';
+        var listStreamer = {{ streamerList|escape|json_encode|raw }};
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.1.0/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.1.0/locales/fr.js"></script>
@@ -30,7 +43,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@4.1.0/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@4.1.0/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/bootstrap@4.1.0/main.min.js"></script>
-
+    <script src="{{ asset('js/typehead.js') }}"></script>
     <script src="{{ asset('js/scriptViewerCalendar.js') }}" type="text/javascript"></script>
        
 {% endblock %}

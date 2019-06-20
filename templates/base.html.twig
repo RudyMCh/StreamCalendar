@@ -22,12 +22,26 @@
                     <li class="nav-item {% if  way =='home' %} active bg-success rounded{% endif %}">
                         <a class="nav-link " href="{{ path('home')}}">Accueil</a>
                     </li>
+                    {% if app.session.get('account') is null %}
                     <li class="nav-item {% if  way =='login' %} active bg-success rounded{% endif %}">
                         <a class="nav-link " href="{{ path('login')}}">connexion</a>
                     </li>
-                    <li class="nav-item {% if  way =='myCalendar' %} active bg-success rounded{% endif %}">
-                        <a class="nav-link " href="{{ path('myCalendar')}}">Mon Calendrier</a>
+                    <li class="nav-item {% if  way =='register' %} active bg-success rounded{% endif %}">
+                        <a class="nav-link " href="{{ path('register')}}">inscription</a>
                     </li>
+                    {% endif %}
+                    {% if app.session.has('account') %}
+                    <li class="nav-item {% if  way =='viewerCalendar' %} active bg-success rounded{% endif %}">
+                        <a class="nav-link " href="{{ path('viewerCalendar')}}">Mon Calendrier viewer</a>
+                    </li>
+                    <li class="nav-item {% if  way =='myCalendar' %} active bg-success rounded{% endif %}">
+                        <a class="nav-link " href="{{ path('myCalendar')}}">Mon Calendrier streamer</a>
+                    </li>
+                    <li class="nav-item {% if  way =='logout' %} active bg-success rounded{% endif %}">
+                        <a class="nav-link " href="{{ path('logout')}}">deconnexion</a>
+                    </li>
+                    {% endif %}
+
                 </ul>
             </div>
         </nav>
