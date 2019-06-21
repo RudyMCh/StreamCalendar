@@ -1,4 +1,47 @@
-document.addEventListener('DOMContentLoaded', () => {
+$(function(){
+
+    // constructs the suggestion engine
+
+    var listStreamerJS = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.whitespace,
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      // `states` is an array of state names defined in "The Basics"
+      local: listStreamer
+    });
+
+    $('#favoriteStreamer .typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    },
+    {
+      name: 'listStreamerJS',
+      source: listStreamerJS
+    });
+
+    var selectedStreamer;
+
+    $('.typeahead').on('typeahead:selected', function(event, datum) {
+      selectedStreamer = datum;
+    });
+    
+    // $('form').submit(function(e){
+    //   e.preventDefault();
+    //   console.log(selectedStreamer);
+    //   $.ajax({
+    //     type: "POST",
+    //     url: extractStreamer,
+    //     dataType:"json",
+    //     data: {"name": selectedStreamer},
+    //     success: function(data){
+    //       dataEvent = data;
+    //       console.log(data);
+    //     }
+
+    //   })
+      
+    // })
+
     var calendarEl = document.getElementById('viewerCalendar');
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -11,26 +54,27 @@ document.addEventListener('DOMContentLoaded', () => {
         themeSystem: "bootstrap",
         handleWindowResize: true,
         height: 600,
-        contentHeight: 350,
+        contentHeight: 500,
+        footer: true,
         selectable:true,
         allDaySlot: false,
         navLink: true,
         columnHeaderHtml: function(date) {
             switch (date.getUTCDay()) {
                 case 1:
-              return '<b>lundi</b>';
+              return '<p>lundi </b>' + date.getDate();
                 case 2:
-              return '<b>mardi</b>';
+              return '<p>mardi </b>' + date.getDate();
                 case 3:
-              return '<b>mercredi</b>';
+              return '<p>mercredi </b>' + date.getDate();
                 case 4:
-              return '<b>jeudi</b>';
+              return '<p>jeudi </b>' + date.getDate();
                 case 5:
-              return '<b>vendredi</b>';
+              return '<p>vendredi </b>' + date.getDate();
                 case 6:
-              return '<b>samedi</b>';
+              return '<p>samedi </b>' + date.getDate();
                 case 0:
-              return '<b>dimanche</b>';
+              return '<p>dimanche </>' + date.getDate();
             }
           },
         
@@ -56,8 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             $(mousEventLeave.el).css('background-color', 'blue');
         },
         events:{
-            url : targetExtract,
-            color: 'blue'
+          url: extractFavoritesEvents,
         },
         timeZone: 'UTC',
         themeSystem: 'bootstrap',

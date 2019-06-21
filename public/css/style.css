@@ -84,8 +84,9 @@ style pour le calendrier*/
 }
 
 .streamCalendar{
-    background-color: orange;
+    background-color: #002B36;
     border-radius: 8px;
+    color:white;
 }
 .fc-today {
     background:none !important;

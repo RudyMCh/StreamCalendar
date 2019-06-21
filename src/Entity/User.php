@@ -54,16 +54,6 @@ class User
     private $token;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="favorite")
-     */
-    private $user;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="user")
-     */
-    private $favorite;
-
-    /**
      * @ORM\Column(type="integer", nullable=true)
      */
     private $twitchId;
@@ -78,10 +68,21 @@ class User
      */
     private $inProcess;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="users")
+     */
+    private $favorite;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="favorite")
+     */
+    private $users;
+
     public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->favorite = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -192,49 +193,6 @@ class User
         return $this;
     }
 
-    public function getUser(): ?self
-    {
-        return $this->user;
-    }
-
-    public function setUser(?self $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|self[]
-     */
-    public function getFavorite(): Collection
-    {
-        return $this->favorite;
-    }
-
-    public function addFavorite(self $favorite): self
-    {
-        if (!$this->favorite->contains($favorite)) {
-            $this->favorite[] = $favorite;
-            $favorite->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFavorite(self $favorite): self
-    {
-        if ($this->favorite->contains($favorite)) {
-            $this->favorite->removeElement($favorite);
-            // set the owning side to null (unless already changed)
-            if ($favorite->getUser() === $this) {
-                $favorite->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getTwitchId(): ?int
     {
         return $this->twitchId;
@@ -267,6 +225,60 @@ class User
     public function setInProcess(int $inProcess): self
     {
         $this->inProcess = $inProcess;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getFavorite(): Collection
+    {
+        return $this->favorite;
+    }
+
+    public function addFavorite(self $favorite): self
+    {
+        if (!$this->favorite->contains($favorite)) {
+            $this->favorite[] = $favorite;
+        }
+
+        return $this;
+    }
+
+    public function removeFavorite(self $favorite): self
+    {
+        if ($this->favorite->contains($favorite)) {
+            $this->favorite->removeElement($favorite);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(self $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->addFavorite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(self $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            $user->removeFavorite($this);
+        }
 
         return $this;
     }

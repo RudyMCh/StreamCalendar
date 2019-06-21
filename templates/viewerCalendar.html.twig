@@ -21,6 +21,16 @@
         {#<div id="viewerCalendar" class="col-8 mx-auto streamCalendar"></div>#}
         <div id="viewerCalendar" class="col-md-6 offset-md-3 streamCalendar"></div>
         {#<div id="modalPlace"></div>#}
+    <div>
+        <form id="favoriteStreamer" class="form-group">
+            <input class="typeahead form-control" type="text" placeholder="Streamer">
+            <input type="submit" class="btn btn-primary" value="ajouter">
+        </form>
+    </div>
+    <h2 class="text-center">mes streamers favoris</h2>
+
+    <div>
+
     </div>
 
     <div class="row">
@@ -37,7 +47,9 @@
   
 
     <script>
-        var targetExtract = "{{ url('extract') }}";       
+        var targetExtract = '{{ url('extract') }}';
+        var extractFavoritesEvents = '{{ url('extractFavoritesEvents') }}';
+        var listStreamer = {{ streamerList|escape|json_encode|raw }};
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.1.0/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.1.0/locales/fr.js"></script>
