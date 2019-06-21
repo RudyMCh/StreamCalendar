@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Entity\Event;
 use \DateTime;
 use App\Service\Recaptcha;
+use App\Service\TokenGenerator;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use \Swift_Mailer;
@@ -22,46 +23,20 @@ class MainController extends AbstractController{
      */
     public function home(){
 
-        $session=$this->get('session');
+        $title = $this->getParameter('site_title');
 
-        $user=$session->get('account');
-        $ur= $this->getDoctrine()->getRepository(User::class);
-        $user1=$ur->findOneById(1);
-        $user2=$ur->findOneById(2);
-        $user3=$ur->findOneById(3);
-        $user->addFavorite($user1);
-        $user->addFavorite($user2);
-        $user->addFavorite($user3);
-        $um=$this->getDoctrine()->getManager()->flush();
-        $myStreamers=$user->getFavorite();
-        dump($myStreamers);
-        $myUsers= $user->getUsers();
-        dump($myUsers);
+        // $userRepo = $this->getDoctrine()->getRepository(User::class);
 
-        if(empty($myStreamers)){
-            return $this->json(["empty" => true]);
-        }else{
-            $er = $this->getDoctrine()->getRepository(Event::class);
-            dump($user);
-            foreach($myStreamers as $streamer){
-                $events=$er->findByStreamer($streamer);
-                foreach($events as $event){
-                    $eventsUsers[] = [
-                        'id' => $event->getId(),
-                        'title' => $event->getTitle(),
-                        'description' => $event->getDescription(),
-                        'start' => $event->getStart()->format('Y-m-d H:i:s'),
-                        'end' => $event->getEnd()->format('Y-m-d H:i:s'),
-                        'streamer' => $event->getStreamer()->getId()
-                    ];
-                }
-            }
-            //dump($eventsUsers);
-        }
+        // $user1 = $userRepo->findOneById(1);
+        // $user2 = $userRepo->findOneById(5);
 
+        // $user2->addFavorite($user1);
 
-       
-        return $this->render('index.html.twig');
+        // $this->getDoctrine()->getManager()->flush();
+
+        // dump($user1);
+
+        return $this->render('index.html.twig', array('title' => $title));
     }
     /**
      * @Route("/mon-calendrier/", name="myCalendar")
@@ -75,7 +50,7 @@ class MainController extends AbstractController{
         }
         if($session->has('account')){
             $type = $session->get('account')->getType();
-            if($type!=1){
+            if($type < 1){
                 throw new NotFoundHttpException('accès non autorisé');
             }else{
                 return $this->render('myCalendar.html.twig');
@@ -217,29 +192,29 @@ class MainController extends AbstractController{
                         $em = $this->getDoctrine()->getManager();
                         $em->persist($user);
                         $em->flush();
-                        $message= (new Swift_Message('mail de confirmation'))
-                            ->setFrom("nous@gmail.com")
-                            ->setTo($email)
-                            ->setBody(
-                                $this->renderView('emails/HelloWorld.html.twig', array(
-                                    "user" => $user,
-                                )),
-                                'text/html'
-                                )
-                            ->addPart(
-                                $this->renderView('emails/HelloWorld.txt.twig', array(
-                                    "user" => $user,
-                                )),
-                                'text/plain'
-                            )
-                        ;
-                        $status = $mailer->send($message);
-                        if($status){
-                            return $this->render('register.html.twig', array('success' => true));
-                        }else{
-                            $errors['errorMail'] = true;
-                            return $this->render('register.html.twig', array('errors' => $errors));
-                        }
+                        // $message= (new Swift_Message('mail de confirmation'))
+                        //     ->setFrom("nous@gmail.com")
+                        //     ->setTo($email)
+                        //     ->setBody(
+                        //         $this->renderView('emails/HelloWorld.html.twig', array(
+                        //             "user" => $user,
+                        //         )),
+                        //         'text/html'
+                        //         )
+                        //     ->addPart(
+                        //         $this->renderView('emails/HelloWorld.txt.twig', array(
+                        //             "user" => $user,
+                        //         )),
+                        //         'text/plain'
+                        //     )
+                        // ;
+                        // $status = $mailer->send($message);
+                        // if($status){
+                        //     return $this->render('register.html.twig', array('success' => true));
+                        // }else{
+                        //     $errors['errorMail'] = true;
+                        //     return $this->render('register.html.twig', array('errors' => $errors));
+                        // }
                     } else {
                         $errors['alreadyUsed'] = true;
                     }
@@ -451,7 +426,7 @@ class MainController extends AbstractController{
     }
 
     /**
-     * @Route("mon-calendrier-viewer", name="viewerCalendar")
+     * @Route("/mon-calendrier-viewer/", name="viewerCalendar")
      */
     public function viewerCalendar(){
         $session= $this->get('session');
@@ -459,36 +434,171 @@ class MainController extends AbstractController{
             return $this->redirectToRoute('login');
         }else{
             $er = $this->getDoctrine()->getRepository(User::class);
-            $streamers = $er->findByType(1);
+            $streamers = $er->findByType(1); // seeking for streamer only
+
             foreach ($streamers as $streamer){
                 $list[] = $streamer->getName();
-            }            
+            }
+            dump($list);
+            
             return $this->render('viewerCalendar.html.twig', array("streamerList" => $list));
         }
     }
 
     /**
-     * @Route("mon-profil", name="viewerProfil")
+     * @Route("/viewer-profile/", name="viewerProfile")
      */
-    public function viewerProfil()
-    {
-        $session=$this->get('session');
+    public function viewerProfile(Request $request){
+        $session= $this->get('session');
         if(!$session->has('account')){
             return $this->redirectToRoute('login');
         }else{
-            $user = $session->get('account');
-            $data= array(
-                "name" => $user->getName(),
-                "email" =>$user->getEmail(),
-                "type" =>$user->getType(),
-            );
+            $choice = $request->request->get('name');
+            
+            //appel des variables
+            if ($request->isMethod('post')) {
+                //bloc des vérifs
+                if(!preg_match('#^.{0,100}$#i', $choice)){
+                    $errors['choix'] = true;
+                    dump($choice);
+                } else {
+                    dump($choice);
+                }
+                
+            }
 
-            return $this->render("viewerProfil.html.twig", array(
-                'data' => $data,
-                'favorite' => $user->getFavorite()
-            ));
+            $er = $this->getDoctrine()->getRepository(User::class);
+            $streamers = $er->findByType(1); // seeking for streamer only
+
+            foreach ($streamers as $streamer){
+                $list[] = $streamer->getName();
+            }
+            //dump($list);
+            
+            return $this->render('viewerProfile.html.twig', array("streamerList" => $list));
+        }
+    }
+
+
+    /**
+     * @Route("/administration-backend", name="adminBackend")
+     * Page
+     */
+    public function adminBackend(Request $request, Swift_Mailer $mailer){
+
+        //     //vérification si déjà connecté
+        //     $session = $this->get('session');
+    
+        //     if(!$session->has('account')){
+        //         return $this->redirectToRoute('login');
+    
+        //     }
+        //     if($session->has('account')){
+        //         $type = $session->get('account')->getType();
+        //         if($type!=2){
+        //             throw new NotFoundHttpException('accès non autorisé');
+        //         }else{
+        //             return $this->render('adminBackend.html.twig');
+        //         }
+        //     }
+    
+        //    // return $this->render('adminBackend.html.twig');
+        // //}
+    
+        // // /**
+        // //  * @Route("/admin-maj-game", name="updateGames")
+        // //  */
+        // // public function updateGames(Request $request)
+        // //{
+        //     //vérification si déjà connecté
+        //     //$session= $this->get('session');
+        //     //$user =$session->get('account');
+            
+        //     // Récupération données JSON
+        //     $gameRepo = $this->getDoctrine()->getRepository(Activity::class);
+        //     $games = $gameRepository->findById($twitch_code);
+        //     if(empty($games)){
+        //         return $this->json(['empty' =>true]);
+        //     }else{ 
+        //         foreach($games as $game){
+        //             $gamesArray[] = [
+        //                 'data.data.id' => $game->getId(),
+        //                 'data.data.name' => $game->getName(),
+        //                 'data.data.box_art_url' => $game->getGame_image()
+        //             ];
+        //         }
+        //         var_dump(json_decode($gamesArray));
+        //         return $this->json($gamesArray);
+        //         dump(json_decode($game));
+        //     }
+        //     // appel des variables
+        //     if($request->isMethod('post')){
+            
+        //         // Récupération données post
+        //         $twitch_code = $request->request->get('id');
+        //         $name = $request->request->get('name');
+        //         $game_image = $request->request->get('box_art_url');
+                
+        //         if(!preg_match('#^[0-9]{1,20}$#i',$twitch_code)){
+        //             $errors['id']= true;
+        //         }
+        //         if(!preg_match('#^.{2,255}$#i',$name)){
+        //             $errors['name']= true;
+        //         }
+        //         if(!preg_match('#^.{2,350}$#i',$game_image)){
+        //             $errors['box_art_url']= true;
+        //         }
+                
+        //         // Si pas d'erreurs
+        //         if(!isset($errors)){
+    
+        //         // Verif si existe pas
+        //         $gameRepo = $this->getDoctrine()->getRepository(Activity::class);
+    
+        //         $gamesIfExist = $gameRepo->findById($twitch_code);
+    
+        //         if(empty($gamesIfExist)){
+    
+        //             // Création d'un nouveau jeu
+        //             $newGames = new Activity();
+        //             // on hydrate $newGames
+        //             $newGames
+        //                 ->setId($twitch_code)
+        //                 ->setName($name)
+        //                 ->setBox_art_url($game_image)
+        //             ;
+        //             // Récupération du manager des entités
+        //             $em = $this->getDoctrine()->getManager();
+        //             $em->merge($newGames);
+        //             $em->flush();
+        //         }
+        //     }
+        //     return $this->json(["success" => true]);
+        // } else {
+        //     return $this->json(["success" => false]);
+        // } 
+    }
+    
+    /**
+     * @Route("/record-favorite/", name="recordFavorite")
+     */
+    public function recordFavorite(Request $request){
+
+        if ($request->isMethod('post')) {
+            $session=$this->get('session');
+            $name=$request->request->get('name');
+            $userMyself = $session->get('account');
+            $ur=$this->getDoctrine()->getRepository(User::class);
+            $user=$ur->findOneByName($name);
+            $userMyself->addFavorite($user);
+            $this->getDoctrine()->getManager()->flush();
+            return $this->json(["success" => true]);
+
+
         }
 
 
+
     }
+
 }
