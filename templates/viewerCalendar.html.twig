@@ -29,12 +29,14 @@
 
 <div></div>
 </div>
-    {{ dump(streamerList)}}
+
 {% endblock %}
 
 {% block javascripts %}
     <script>
         var targetExtract = '{{ url('extract') }}';
+        var extractFavoritesEvents = '{{ url('extractFavoritesEvents') }}';
+        var listStreamer = {{ streamerList|escape|json_encode|raw }};
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.1.0/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.1.0/locales/fr.js"></script>

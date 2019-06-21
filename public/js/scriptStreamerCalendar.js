@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         handleWindowResize: true,
         height: 600,
         contentHeight: 500,
+        footer: true,
         editable:true,
         selectable:true,
         allDaySlot: false,
@@ -43,19 +44,19 @@ document.addEventListener('DOMContentLoaded', () => {
         columnHeaderHtml: function(date) {
             switch (date.getUTCDay()) {
                 case 1:
-              return '<b>lundi</b>';
+              return '<b>lundi </b>' + date.getDate();
                 case 2:
-              return '<b>mardi</b>';
+              return '<b>mardi </b>' + date.getDate();
                 case 3:
-              return '<b>mercredi</b>';
+              return '<b>mercredi </b>' + date.getDate();
                 case 4:
-              return '<b>jeudi</b>';
+              return '<b>jeudi </b>' + date.getDate();
                 case 5:
-              return '<b>vendredi</b>';
+              return '<b>vendredi </b>' + date.getDate();
                 case 6:
-              return '<b>samedi</b>';
+              return '<b>samedi </b>' + date.getDate();
                 case 0:
-              return '<b>dimanche</b>';
+              return '<b>dimanche </b>' + date.getDate();
             }
           },
         
