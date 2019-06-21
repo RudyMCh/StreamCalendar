@@ -1,0 +1,56 @@
+{% extends "base.html.twig" %}
+{% block title %}Administration{% endblock %}
+{% block body %}
+    <h1 class="text-center">Administration</h1>
+
+    <div class="container"
+        <div class="row">
+            <h5 class="text-center">Récupération  Api Twitch des 100 meilleurs Games actuels(diffusion): https://api.twitch.tv/helix/games/top?first=100</h5><br>
+            <input type="submit" class="btn btn-danger" value="API Twitch Games"></input>
+        </div>
+    </div> 
+{% endblock %}
+{% block javascripts %}
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<script>
+// Fonction qui échappe les métacaractères HTML (équivalent de htmlspecialchars PHP)
+        function escapeHtml(text) {
+            text = text.toString();
+            var map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+            // On fait une requête AJAX sur le site API Twitch Game pour récupérer les 100 premiers Games actuels en diffusion
+            
+            $.ajax({
+
+                type: 'GET',
+                url: 'https://api.twitch.tv/helix/games/top?first=100',
+                dataType: 'json',
+                timeout: 30000,
+                headers: {
+                    'Client-ID': '04zu3b1v2s1h7dpk5m4om1q6mgck5s'
+                },
+                
+                success: function(data){
+                console.log(data)
+                
+                },
+
+                error: function(){
+                    // La requête AJAX a échoué, donc message d'erreur
+                    displayMsg('Erreur lors de la récupération des données');
+                }
+            });
+
+</script>
+{% endblock %}
