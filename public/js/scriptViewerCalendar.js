@@ -25,22 +25,22 @@ $(function(){
       selectedStreamer = datum;
     });
     
-    // $('form').submit(function(e){
-    //   e.preventDefault();
-    //   console.log(selectedStreamer);
-    //   $.ajax({
-    //     type: "POST",
-    //     url: extractStreamer,
-    //     dataType:"json",
-    //     data: {"name": selectedStreamer},
-    //     success: function(data){
-    //       dataEvent = data;
-    //       console.log(data);
-    //     }
+      // $('form').submit(function(e){
+      //   e.preventDefault();
+      //   console.log(selectedStreamer);
+      //   $.ajax({
+      //     type: "POST",
+      //     url: extractStreamer,
+      //     dataType:"json",
+      //     data: {"name": selectedStreamer},
+      //     success: function(data){
+      //       dataEvent = data;
+      //       console.log(data);
+      //     }
 
-    //   })
-      
-    // })
+      //   })
+        
+      // })
 
     var calendarEl = document.getElementById('viewerCalendar');
 
@@ -97,10 +97,11 @@ $(function(){
             
         },
         eventMouseLeave: function(mousEventLeave){
-            $(mousEventLeave.el).css('background-color', 'blue');
+            $(mousEventLeave.el).css('background-color', 'orange');
         },
         events:{
           url: extractFavoritesEvents,
+          color: 'orange'
         },
         timeZone: 'UTC',
         themeSystem: 'bootstrap',

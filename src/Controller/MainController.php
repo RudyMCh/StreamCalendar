@@ -22,20 +22,46 @@ class MainController extends AbstractController{
      */
     public function home(){
 
-        $title = $this->getParameter('site_title');
+        $session=$this->get('session');
 
-        $userRepo = $this->getDoctrine()->getRepository(User::class);
+        $user=$session->get('account');
+        $ur= $this->getDoctrine()->getRepository(User::class);
+        $user1=$ur->findOneById(1);
+        $user2=$ur->findOneById(2);
+        $user3=$ur->findOneById(3);
+        $user->addFavorite($user1);
+        $user->addFavorite($user2);
+        $user->addFavorite($user3);
+        $um=$this->getDoctrine()->getManager()->flush();
+        $myStreamers=$user->getFavorite();
+        dump($myStreamers);
+        $myUsers= $user->getUsers();
+        dump($myUsers);
 
-        $user1 = $userRepo->findOneById(1);
-        $user2 = $userRepo->findOneById(5);
+        if(empty($myStreamers)){
+            return $this->json(["empty" => true]);
+        }else{
+            $er = $this->getDoctrine()->getRepository(Event::class);
+            dump($user);
+            foreach($myStreamers as $streamer){
+                $events=$er->findByStreamer($streamer);
+                foreach($events as $event){
+                    $eventsUsers[] = [
+                        'id' => $event->getId(),
+                        'title' => $event->getTitle(),
+                        'description' => $event->getDescription(),
+                        'start' => $event->getStart()->format('Y-m-d H:i:s'),
+                        'end' => $event->getEnd()->format('Y-m-d H:i:s'),
+                        'streamer' => $event->getStreamer()->getId()
+                    ];
+                }
+            }
+            //dump($eventsUsers);
+        }
 
-        $user2->addFavorite($user1);
 
-        $this->getDoctrine()->getManager()->flush();
-
-        dump($user1);
-;
-        return $this->render('index.html.twig', array('title' => $title));
+       
+        return $this->render('index.html.twig');
     }
     /**
      * @Route("/mon-calendrier/", name="myCalendar")
@@ -289,26 +315,30 @@ class MainController extends AbstractController{
         $session=$this->get('session');
 
         $user=$session->get('account');
-        $favoriteStreamers=$user->getFavorite();
 
-        if(empty($favoriteStreamers)){
+        $myStreamers=$user->getFavorite();
+
+
+        if(empty($myStreamers)){
             return $this->json(["empty" => true]);
         }else{
-            foreach($favoriteStreamers as $favoriteStreamer){
-                $events = $favoriteStreamer->getEvents();
+            $eventsUsers = [];
+            $er = $this->getDoctrine()->getRepository(Event::class);
+            foreach($myStreamers as $streamer){
+                $events=$er->findByStreamer($streamer);
                 foreach($events as $event){
-                        $eventsArray[] = [
-                            'id' => $event->getId(),
-                            'title' => $event->getTitle(),
-                            'description' => $event->getDescription(),
-                            'start' => $event->getStart()->format('Y-m-d H:i:s'),
-                            'end' => $event->getEnd()->format('Y-m-d H:i:s'),
-                            'streamer' => $event->getStreamer()->getId()
-                        
+                    $eventsUsers[] = [
+                        'id' => $event->getId(),
+                        'title' => $event->getTitle(),
+                        'description' => $event->getDescription(),
+                        'start' => $event->getStart()->format('Y-m-d H:i:s'),
+                        'end' => $event->getEnd()->format('Y-m-d H:i:s'),
+                        'streamer' => $event->getStreamer()->getId()
                     ];
                 }
             }
-            return $this->json($eventsArray);
+            // return $this->json($eventsUsers);
+            dump($myStreamers);
         }
     }
     
@@ -435,5 +465,30 @@ class MainController extends AbstractController{
             }            
             return $this->render('viewerCalendar.html.twig', array("streamerList" => $list));
         }
+    }
+
+    /**
+     * @Route("mon-profil", name="viewerProfil")
+     */
+    public function viewerProfil()
+    {
+        $session=$this->get('session');
+        if(!$session->has('account')){
+            return $this->redirectToRoute('login');
+        }else{
+            $user = $session->get('account');
+            $data= array(
+                "name" => $user->getName(),
+                "email" =>$user->getEmail(),
+                "type" =>$user->getType(),
+            );
+
+            return $this->render("viewerProfil.html.twig", array(
+                'data' => $data,
+                'favorite' => $user->getFavorite()
+            ));
+        }
+
+
     }
 }

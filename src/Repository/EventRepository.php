@@ -20,6 +20,14 @@ class EventRepository extends ServiceEntityRepository
     }
 
     // /**
+    //  * @return Event[] Returns an array of Event Objects
+    //  */
+    // public function findByMultipleStreamer($array){
+    //     return $this->createQueryBuilder('e')
+    //         ->
+    // }
+
+    // /**
     //  * @return Event[] Returns an array of Event objects
     //  */
     /*

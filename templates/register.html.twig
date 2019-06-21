@@ -42,8 +42,6 @@
                     {% if errors.confirmPassword is defined %}
                     <p style="color:red">confirmation mot de passe incorrect</p>
                     {% endif %}
-                    
-                    
                     {% if errors.errorMail is defined %}
                     <p style="color:red">erreur lors de l'envoi du mail, réessayez</p>
                     {% endif %}
@@ -54,5 +52,4 @@
         </div>
         {% endif %}
     {% endif %}
-    
 {% endblock %}

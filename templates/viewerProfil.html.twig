@@ -1,0 +1,29 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+
+<h1>Mon profil</h1>
+
+<ul>
+    <li>{{ data.name }}</li>
+    <li>{{ data.email }}</li>
+    {% if data.type == 0 %}
+    <li>mon statut : viewer</li>
+    {% endif %}
+    {% if data.type == 1 %}
+    <li>mon statut : streamer</li>
+    {% endif %}
+    {% if data.type == 2 %}
+    <li>mon statut : admin</li>
+    {% endif %}
+</ul>
+
+<h2>mes streamers suivis</h2>
+
+<ul class="text-center">
+    {% for streamer in favorite %}
+        <li>{{ streamer.name }}</li>
+    {% endfor %}
+</ul>
+    
+{% endblock %}
