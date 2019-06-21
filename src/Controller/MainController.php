@@ -25,17 +25,6 @@ class MainController extends AbstractController{
 
         $title = $this->getParameter('site_title');
 
-        // $userRepo = $this->getDoctrine()->getRepository(User::class);
-
-        // $user1 = $userRepo->findOneById(1);
-        // $user2 = $userRepo->findOneById(5);
-
-        // $user2->addFavorite($user1);
-
-        // $this->getDoctrine()->getManager()->flush();
-
-        // dump($user1);
-
         return $this->render('index.html.twig', array('title' => $title));
     }
     /**
@@ -291,7 +280,18 @@ class MainController extends AbstractController{
 
         $user=$session->get('account');
 
-        $myStreamers=$user->getFavorite();
+        $em = $this->getDoctrine()->getManager();
+
+        $user = $em->merge($user);
+
+        dump($user);
+        
+        $user->getFavorite()->initialize();
+        
+        dump($user);
+        $myStreamers = $user->getFavorite();
+
+        dump($myStreamers);
 
 
         if(empty($myStreamers)){
@@ -312,7 +312,8 @@ class MainController extends AbstractController{
                     ];
                 }
             }
-            // return $this->json($eventsUsers);
+            dump($eventsUsers);
+            return $this->json($eventsUsers);
             dump($myStreamers);
         }
     }
@@ -433,15 +434,19 @@ class MainController extends AbstractController{
         if(!$session->has('account')){
             return $this->redirectToRoute('login');
         }else{
-            $er = $this->getDoctrine()->getRepository(User::class);
-            $streamers = $er->findByType(1); // seeking for streamer only
+            $um = $this->getDoctrine()->getManager();
+            $user = $session->get('account');
+            $user=$um->merge($user);
+            //$user->getFavorite()->initialize();
+            $streamers = $user->getFavorite();
+            dump($streamers);
 
-            foreach ($streamers as $streamer){
-                $list[] = $streamer->getName();
-            }
-            dump($list);
+            // foreach ($streamers as $streamer){
+            //     $list[] = $streamer->getName();
+            // }
+            // dump($list);
             
-            return $this->render('viewerCalendar.html.twig', array("streamerList" => $list));
+            return $this->render('viewerCalendar.html.twig', array("myStreamers" => $streamers));
         }
     }
 

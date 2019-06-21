@@ -1,47 +1,5 @@
 $(function(){
 
-    // constructs the suggestion engine
-
-    var listStreamerJS = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.whitespace,
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      // `states` is an array of state names defined in "The Basics"
-      local: listStreamer
-    });
-
-    $('#favoriteStreamer .typeahead').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1
-    },
-    {
-      name: 'listStreamerJS',
-      source: listStreamerJS
-    });
-
-    var selectedStreamer;
-
-    $('.typeahead').on('typeahead:selected', function(event, datum) {
-      selectedStreamer = datum;
-    });
-    
-      // $('form').submit(function(e){
-      //   e.preventDefault();
-      //   console.log(selectedStreamer);
-      //   $.ajax({
-      //     type: "POST",
-      //     url: extractStreamer,
-      //     dataType:"json",
-      //     data: {"name": selectedStreamer},
-      //     success: function(data){
-      //       dataEvent = data;
-      //       console.log(data);
-      //     }
-
-      //   })
-        
-      // })
-
     var calendarEl = document.getElementById('viewerCalendar');
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -92,7 +50,6 @@ $(function(){
             });
         },
         eventMouseEnter: function(mouseEnterInfo){
-            console.log(mouseEnterInfo);
             $(mouseEnterInfo.el).css('background-color', 'black');
             
         },
@@ -108,7 +65,8 @@ $(function(){
         
         
         eventClick: function(info){
-            console.log(info);
+            console.log(info.event._def.title);
+            console.log(info.event._def.extendedProps.description);
         }
     });
     calendar.render();
