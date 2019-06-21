@@ -1,7 +1,41 @@
 {% extends "base.html.twig" %}
-
-{% block title %}connexion{% endblock %}
+{% block title %}
+    connexion
+{% endblock %}
 {% block body %}
+<h1>Connexion</h1>
+{# formulaire de connexion bootstrap #}
 
-<h1 class="text-center html twig">connexion</h1>
+{% if success is defined %}
+<p style="color:green">vous êtes bien connecté</p>
+{% else %}
+<div class="row">
+    <form class="form-group col-12 col-md-6 mx-auto" action="{{ path('login') }} " method="POST">
+        <fieldset>
+            <label for="email">email</label>
+            <input class="form-control" type="text" name="email" placeholder="email">
+            {% if errors.email is defined %}
+            <p style="color:red";>email invalide</p>
+            {% endif %}
+            <label for="subject">sujet</label>
+            <input class="form-control" type="text" name="password" placeholder="sujet">
+            {% if errors.password is defined %}
+            <p style="color:red";>mot de passe invalide</p>
+            {% endif %}
+            {% if errors.login is defined %}
+            <p style="color:red";>email ou mot de passe incorrect</p>
+            {% endif %}
+            {% if errors.inactiveAccount is defined %}
+            <p style="color:red";>Veuillez activer votre compte</p>
+            {% endif %}
+            
+        
+            <input class="btn btn-primary col-12 col-md-4 mt-3" type="submit" value="Valider">
+        </fieldset>
+    </form>
+</div>
+
+{% endif %}
+
+    
 {% endblock %}
