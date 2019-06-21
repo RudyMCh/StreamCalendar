@@ -1,0 +1,23 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+
+
+
+<h1>{{ name }}</h1>
+<p>mon id twitch : {{ twhitchId }}</p>
+
+<ul>
+{% for item in activity %}
+    <li>{{ item.name }}</li>
+{% endfor %}
+</ul>
+<img style="border-radius: 8px" src="{{ imgProfil }}" alt="avatar de {{ name }}">
+
+    
+{% endblock %}
+
+
+{% block javascripts %}
+<script src={{ asset('js/script-api.js') }}></script>
+{% endblock %}

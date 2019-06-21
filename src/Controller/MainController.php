@@ -297,6 +297,7 @@ class MainController extends AbstractController{
         if(empty($myStreamers)){
             return $this->json(["empty" => true]);
         }else{
+            $colorList=["orange", "red", "lightblue", "green", "purple", "grey", "blue"];
             $eventsUsers = [];
             $er = $this->getDoctrine()->getRepository(Event::class);
             foreach($myStreamers as $streamer){
@@ -310,7 +311,7 @@ class MainController extends AbstractController{
                         'end' => $event->getEnd()->format('Y-m-d H:i:s'),
                         'streamer' => $event->getStreamer()->getId()
                     ];
-                }
+                };
             }
             dump($eventsUsers);
             return $this->json($eventsUsers);
@@ -417,12 +418,20 @@ class MainController extends AbstractController{
     }
 
     /**
-     * @Route("supprimer-un-evenement/", name="delete")
+     * @Route("supprimer-un-evenement/", name="deleteEvent")
      */
-    public function delete(Request $request){
+    public function deleteEvent(Request $request){
         if($request->isMethod("POST")){
             //récupréation des données envoyé par la requête AJAX
             $publicId = $request->request->get('publicId');
+            $er=$this->getDoctrine()->getRepository(Event::class);
+            $event=$er->findOneById($publicId);
+            dump($publicId);
+            dump($event);
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($event);
+            $em->flush();
+            return $this->json(["success" => true]);
         }
     }
 
@@ -436,16 +445,9 @@ class MainController extends AbstractController{
         }else{
             $um = $this->getDoctrine()->getManager();
             $user = $session->get('account');
+            //reattached the user to doctrine to get the favorites
             $user=$um->merge($user);
-            //$user->getFavorite()->initialize();
-            $streamers = $user->getFavorite();
-            dump($streamers);
-
-            // foreach ($streamers as $streamer){
-            //     $list[] = $streamer->getName();
-            // }
-            // dump($list);
-            
+            $streamers = $user->getFavorite();            
             return $this->render('viewerCalendar.html.twig', array("myStreamers" => $streamers));
         }
     }
@@ -482,6 +484,30 @@ class MainController extends AbstractController{
             
             return $this->render('viewerProfile.html.twig', array("streamerList" => $list));
         }
+    }
+    /**
+     * @Route("mon-profil-streamer", name="streamerProfil")
+     */
+    public function streamerProfil(){
+        $session = $this->get('session');
+        if(!$session->has('account') || $session->get('account')->getType()<1){
+            throw new NotFoundHttpException('non autorisé'); 
+        }else{
+            $user = $session->get('account');
+            $um= $this->getDoctrine()->getManager();
+            $user=$um->merge($user);
+
+
+        }
+
+
+
+        return $this->render('streamerProfil.html.twig', array(
+            "activity" => $user->getActivity(),
+            "name" => $user->getName(),
+            "twhitchId" => $user->getTwitchId(),
+            "imgProfil" => str_replace("{width}x{height}", "100x100",$user->getProfilImage())   
+        ));
     }
 
 

@@ -5,6 +5,9 @@ var modalEvent = `
 <div id="myModal2" class="modal col-12">
     <div class="modal-content form-group">
         <span id="close2" class="close">&times;</span>
+        <form id="eventDelete" action="{{ path('delete') }}" method="POST" class="form-group col-12">
+        <input type="submit" class="btn btn-danger" value="supprimer">
+        </form>
     </div>
 </div>`;
 var modalNewEvent = `
@@ -194,6 +197,30 @@ document.addEventListener('DOMContentLoaded', () => {
             $('#close2').click(function(){
                 $('#myModal2').remove();
             });
+            $('#eventDelete').submit(function(e){
+                e.preventDefault();
+                console.log(info.event._def.publicId);
+                $.ajax({
+                    type: 'POST',
+                    url: deleteTarget,
+                    dataType: 'json',
+                    data:{publicId: info.event._def.publicId},
+                    success: function(data){
+                        if(data.success){
+                            console.log("suppression ok");
+                            $('#myModal2').remove();
+                            calendar.refetchEvents();
+                        }
+                    },
+                    error: function(data){
+                        console.log('pas de suppression');
+                        $('#myModal2').remove();
+                        alert("suppression échouée")
+
+                    }
+                })
+
+            })
         }
         
     });
