@@ -1,16 +1,46 @@
-function setOverlay(){
-  $('.pageperso').append(`
-  <div class="overlay">
-      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><path stroke="none" d="M30 50A20 20 0 0 0 70 50A20 22 0 0 1 30 50" fill="#FF0000"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 51;360 50 51" keyTimes="0;1" dur="1s" begin="0s" repeatCount="indefinite"></animateTransform></path></svg>
-  </div>`);
-}
-
-// Function to cancel overlay feature
-function removeOverlay(){
-  $('.overlay').remove();
-}
-
 $(function(){
+
+    // // constructs the suggestion engine
+
+    // var listStreamerJS = new Bloodhound({
+    //   datumTokenizer: Bloodhound.tokenizers.whitespace,
+    //   queryTokenizer: Bloodhound.tokenizers.whitespace,
+    //   // `states` is an array of state names defined in "The Basics"
+    //   local: listStreamer
+    // });
+
+    // $('#favoriteStreamer .typeahead').typeahead({
+    //   hint: true,
+    //   highlight: true,
+    //   minLength: 1
+    // },
+    // {
+    //   name: 'listStreamerJS',
+    //   source: listStreamerJS
+    // });
+
+    // var selectedStreamer;
+
+    // $('.typeahead').on('typeahead:selected', function(event, datum) {
+    //   selectedStreamer = datum;
+    // });
+    
+      // $('form').submit(function(e){
+      //   e.preventDefault();
+      //   console.log(selectedStreamer);
+      //   $.ajax({
+      //     type: "POST",
+      //     url: extractStreamer,
+      //     dataType:"json",
+      //     data: {"name": selectedStreamer},
+      //     success: function(data){
+      //       dataEvent = data;
+      //       console.log(data);
+      //     }
+
+      //   })
+        
+      // })
 
     var calendarEl = document.getElementById('viewerCalendar');
 
@@ -76,10 +106,10 @@ $(function(){
         loading: function(isLoading, view){
           if(isLoading){
             console.log("loading");
-            setOverlay();
+            //setOverlay();
           }else{
             console.log("fini de loading");
-            removeOverlay();
+            //removeOverlay();
           }
         },
         events:{
