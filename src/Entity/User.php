@@ -78,11 +78,17 @@ class User
      */
     private $users;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Activity", inversedBy="users")
+     */
+    private $activity;
+
     public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->favorite = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->activity = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -278,6 +284,32 @@ class User
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
             $user->removeFavorite($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Activity[]
+     */
+    public function getActivity(): Collection
+    {
+        return $this->activity;
+    }
+
+    public function addActivity(Activity $activity): self
+    {
+        if (!$this->activity->contains($activity)) {
+            $this->activity[] = $activity;
+        }
+
+        return $this;
+    }
+
+    public function removeActivity(Activity $activity): self
+    {
+        if ($this->activity->contains($activity)) {
+            $this->activity->removeElement($activity);
         }
 
         return $this;

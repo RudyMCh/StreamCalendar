@@ -5,6 +5,9 @@ var modalEvent = `
 <div id="myModal2" class="modal col-12">
     <div class="modal-content form-group">
         <span id="close2" class="close">&times;</span>
+        <form id="eventDelete" action="{{ path('delete') }}" method="POST" class="form-group col-12">
+        <input type="submit" class="btn btn-danger" value="supprimer">
+        </form>
     </div>
 </div>`;
 var modalNewEvent = `
@@ -12,7 +15,7 @@ var modalNewEvent = `
     <div class="modal-content">
         <span id="close1" class="close">&times;</span>
         <form id="event" action="{{ path('insert') }}" method="POST" class="form-group col-12" >
-            <input type="text" name="title" placeholder="titre" class="form-control">
+            <input type="text" id="bloodhound" name="title" placeholder="titre" class="form-control typeahead">
             <input type="text" name="description" placeholder="description" class="form-control">
             <input type="text" name="start" class="form-control" style="display:none">
             <input type="text" name="end" class="form-control" style="display:none">
@@ -65,25 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
-        eventRender: function(info) {
-            var tooltip = new Tooltip(info.el, {
-                title: info.event.extendedProps.description,
-                placement: 'top',
-                trigger: 'hover',
-                container: 'body'
-            });
-        },
-        eventMouseEnter: function(mouseEnterInfo){
-            console.log(mouseEnterInfo);
-            $(mouseEnterInfo.el).css('background-color', 'black');
+        // 3,
+        // eventMouseEnter: function(mouseEnterInfo){
+        //     console.log(mouseEnterInfo);
+        //     $(mouseEnterInfo.el).css('background-color', 'black');
             
-        },
-        eventMouseLeave: function(mousEventLeave){
-            $(mousEventLeave.el).css('background-color', 'blue');
-        },
+        // },
+        // eventMouseLeave: function(mousEventLeave){
+        //     $(mousEventLeave.el).css('background-color', 'blue');
+        // },
         events:{
-            url : targetExtract,
-            color: 'blue'
+            url : targetExtract
         },
         timeZone: 'UTC',
         themeSystem: 'bootstrap',
@@ -139,6 +134,23 @@ document.addEventListener('DOMContentLoaded', () => {
             //add a listener on the div modalPlace et on cree un formulaire modal
             var $modal = $('#modalPlace');
             $modal.append(modalNewEvent);
+            var activity = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.whitespace,
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                
+                local: activities
+                });
+        
+                $('#bloodhound.typeahead').typeahead({
+                    hint: true,
+                    highlight: true,
+                    minLength: 1
+                },
+                {
+                    name: 'activity',
+                    source: activity
+                });
+        
             $('#close1').click(function(){
                 $('#myModal1').remove();
             });
@@ -194,6 +206,30 @@ document.addEventListener('DOMContentLoaded', () => {
             $('#close2').click(function(){
                 $('#myModal2').remove();
             });
+            $('#eventDelete').submit(function(e){
+                e.preventDefault();
+                console.log(info.event._def.publicId);
+                $.ajax({
+                    type: 'POST',
+                    url: deleteTarget,
+                    dataType: 'json',
+                    data:{publicId: info.event._def.publicId},
+                    success: function(data){
+                        if(data.success){
+                            console.log("suppression ok");
+                            $('#myModal2').remove();
+                            calendar.refetchEvents();
+                        }
+                    },
+                    error: function(data){
+                        console.log('pas de suppression');
+                        $('#myModal2').remove();
+                        alert("suppression échouée")
+
+                    }
+                })
+
+            })
         }
         
     });
