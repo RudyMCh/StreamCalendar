@@ -22,6 +22,7 @@
 
 {% block javascripts %}
     <script>
+        var activities = {{ activities|escape|json_encode|raw }}
         var deleteTarget = '{{ url('deleteEvent') }}'
         var targetExtract = '{{ url('extract') }}';    
         var targetInsert = '{{ url('insert') }}';    
@@ -34,7 +35,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@4.1.0/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@4.1.0/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/bootstrap@4.1.0/main.min.js"></script>
-
+    <script src="{{ asset('js/typeahead.bundle.js') }}"></script>   
     <script src="{{ asset('js/scriptStreamerCalendar.js') }}" type="text/javascript"></script>
-       
+    <script>
+        
+        console.log(activities);
+        
+    </script>
 {% endblock %}

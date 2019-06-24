@@ -66,13 +66,13 @@ $(function(){
             // }
 
         },
-        eventMouseEnter: function(mouseEnterInfo){
-            $(mouseEnterInfo.el).css('background-color', 'black');
+        // eventMouseEnter: function(mouseEnterInfo){
+        //     $(mouseEnterInfo.el).css('background-color', 'black');
             
-        },
-        eventMouseLeave: function(mousEventLeave){
-            $(mousEventLeave.el).css('background-color', 'orange');
-        },
+        // },
+        // eventMouseLeave: function(mousEventLeave){
+        //     $(mousEventLeave.el).css('background-color', 'orange');
+        // },
         loading: function(isLoading, view){
           if(isLoading){
             console.log("loading");
@@ -83,8 +83,7 @@ $(function(){
           }
         },
         events:{
-          url: extractFavoritesEvents,
-          color: 'orange'
+          url: extractFavoritesEvents
         },
         timeZone: 'UTC',
         themeSystem: 'bootstrap',

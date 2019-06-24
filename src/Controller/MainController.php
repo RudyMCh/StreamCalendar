@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\User;
 use App\Entity\Event;
+use App\Entity\Activity;
 use \DateTime;
 use App\Service\Recaptcha;
 use App\Service\TokenGenerator;
@@ -35,14 +36,27 @@ class MainController extends AbstractController{
         $session=$this->get('session');
         if(!$session->has('account')){
             throw new NotFoundHttpException('pas identifié');
-
         }
         if($session->has('account')){
             $type = $session->get('account')->getType();
             if($type < 1){
                 throw new NotFoundHttpException('accès non autorisé');
             }else{
-                return $this->render('myCalendar.html.twig');
+                $user = $session->get('account');
+                dump($user);
+                $um = $this->getDoctrine()->getManager();
+                $user=$um->merge($user);
+                $activities = $user->getActivity();
+                dump($activities);
+                $activityList = [];
+                foreach($activities as $activity){
+                    $activityList[]=$activity->getName();
+                }
+                dump($activityList);
+
+
+
+                return $this->render('myCalendar.html.twig', array("activities" => $activityList));
             }
         }
     }
@@ -219,6 +233,9 @@ class MainController extends AbstractController{
 
     /**
      * @Route("/extraction", name="extract")
+     * 
+     * fonction pour extraire les evenements créés par un streamer sur son agenda,
+     *  utilisé par javascript fullcalendar fonction events
      */
     public function extract()
     {   
@@ -236,7 +253,8 @@ class MainController extends AbstractController{
                     'description' => $event->getDescription(),
                     'start' => $event->getStart()->format('Y-m-d H:i:s'),
                     'end' => $event->getEnd()->format('Y-m-d H:i:s'),
-                    'streamer' => $event->getStreamer()->getId()
+                    'streamer' => $event->getStreamer()->getId(),
+                    'color' => $event->getColor()
                 ];
 
             }
@@ -248,6 +266,8 @@ class MainController extends AbstractController{
 
     /**
      * @Route("/extractStreamer", name="extractStreamer")
+     * 
+     * 
      */
     public function extractStreamer(Request $request){
         $name= $request->request->get('name');
@@ -274,6 +294,8 @@ class MainController extends AbstractController{
 
     /**
      * @Route("/extractFavoritesEvents",name="extractFavoritesEvents" )
+     * 
+     * fonction pour extraire les evenements de streamer favoris du user actuel, page viewerCalendar
      */
     public function extractFavoritesEvents(){
         $session=$this->get('session');
@@ -297,7 +319,6 @@ class MainController extends AbstractController{
         if(empty($myStreamers)){
             return $this->json(["empty" => true]);
         }else{
-            $colorList=["orange", "red", "lightblue", "green", "purple", "grey", "blue"];
             $eventsUsers = [];
             $er = $this->getDoctrine()->getRepository(Event::class);
             foreach($myStreamers as $streamer){
@@ -307,6 +328,7 @@ class MainController extends AbstractController{
                         'id' => $event->getId(),
                         'title' => $event->getTitle(),
                         'description' => $event->getDescription(),
+                        'color' => $event->getColor(),
                         'start' => $event->getStart()->format('Y-m-d H:i:s'),
                         'end' => $event->getEnd()->format('Y-m-d H:i:s'),
                         'streamer' => $event->getStreamer()->getId()
@@ -315,12 +337,13 @@ class MainController extends AbstractController{
             }
             dump($eventsUsers);
             return $this->json($eventsUsers);
-            dump($myStreamers);
         }
     }
     
     /**
      * @Route("/insertion", name="insert")
+     * 
+     * fonction pour insérer un evenement par un streamer, utilisé par fullcalendar, fonction select, streamcalendar.js
      */
     public function insert(Request $request)
     {
@@ -337,20 +360,24 @@ class MainController extends AbstractController{
                 $errors['description']= true;
             }
             if(!preg_match('#^.{1,200}$#', $start)){
-                $errors['start']= true;   
-                $errors['startinfo']= $start;   
+                $errors['start']= true;      
             }
             if(!preg_match('#^.{1,200}$#', $end)){
                 $errors['end']= true;   
             }
+
             if(!isset($errors)){
                 $user = $session->get('account');
                 $id=$user->getId();
                 $er = $this->getDoctrine()->getRepository(User::class);
                 $streamer = $er->findOneById($id);
+                $ar= $this->getDoctrine()->getRepository(Activity::class);
+                $activity=$ar->findOneByName($title);
+                $color=$activity->getColor();
                 $event = new Event();
                 $startD = new DateTime($start);
                 $endD = new DateTime($end);
+                dump($color);
                 dump($endD);
                 $event
                     ->setTitle($title)
@@ -358,6 +385,7 @@ class MainController extends AbstractController{
                     ->setStart($startD)
                     ->setEnd($endD)
                     ->setStreamer($streamer)
+                    ->setColor($color)
                 ;
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($event);
@@ -374,6 +402,10 @@ class MainController extends AbstractController{
 
     /**
      * @Route("/mise-a-jour-deplacement/", name="updateDrop")
+     * 
+     * 
+     * fonction pour mettre à jour en bdd un evenement qui est déplacé sur le calendrier du streamer
+     * utilisé par fullcalendar, fonction eventDrop
     */
     public function updateDrop(Request $request){
         if($request->isMethod("POST")){
@@ -396,6 +428,9 @@ class MainController extends AbstractController{
     }
     /**
      * @Route("/mise-a-jour-resize/", name="updateResize")
+     * 
+     * fonction pour mettre à jour un evenement quand sa durée est modifiée
+     * utilisée par fullcalendar, fonction eventresize
     */
     public function updateResize(Request $request){
         if($request->isMethod("POST")){
@@ -418,7 +453,9 @@ class MainController extends AbstractController{
     }
 
     /**
-     * @Route("supprimer-un-evenement/", name="deleteEvent")
+     * @Route("/supprimer-un-evenement/", name="deleteEvent")
+     * 
+     * fonction pour supprimer un evenement, utilisée par fullcalendar, fonction eventClick
      */
     public function deleteEvent(Request $request){
         if($request->isMethod("POST")){
@@ -486,28 +523,47 @@ class MainController extends AbstractController{
         }
     }
     /**
-     * @Route("mon-profil-streamer", name="streamerProfil")
+     * @Route("/mon-profil-streamer/", name="streamerProfil")
      */
-    public function streamerProfil(){
+    public function streamerProfil(Request $request){
+        //verif session
         $session = $this->get('session');
         if(!$session->has('account') || $session->get('account')->getType()<1){
             throw new NotFoundHttpException('non autorisé'); 
         }else{
+            //si session, on force l'hydratation de user pour récupérer sa collection d'activité favorite pour lui proposer
+            // un choix restraint et pour attribuer une couleur à ses activités
             $user = $session->get('account');
             $um= $this->getDoctrine()->getManager();
             $user=$um->merge($user);
-
-
+            $ar = $this->getDoctrine()->getRepository(Activity::class);
+            $activities = $ar->findAll();
+            $activityList = [];
+            foreach($activities as $activity){
+                $activityList[]=$activity->getName();
+            }
+            dump($activityList);
+            if($request->isMethod('POST')){
+                //enregistrement de l'activité choisie dans la page profil
+                $activityChosen = $request->request->get('activity');
+                dump($activityChosen);
+                //verif de $activityChosen dans activityList à faire!!!!!!!!
+                if(!isset($errors)){
+                    $activityRegistered = $ar->findOneByName($activityChosen);
+                    dump($activityRegistered);
+                    $user->addActivity($activityRegistered);
+                    $um->flush();
+                }
+            }
         }
-
-
-
         return $this->render('streamerProfil.html.twig', array(
             "activity" => $user->getActivity(),
             "name" => $user->getName(),
             "twhitchId" => $user->getTwitchId(),
-            "imgProfil" => str_replace("{width}x{height}", "100x100",$user->getProfilImage())   
+            "imgProfil" => str_replace("{width}x{height}", "100x100",$user->getProfilImage()),
+            "activityList" => $activityList
         ));
+    
     }
 
 
