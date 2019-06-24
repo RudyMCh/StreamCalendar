@@ -1,0 +1,24 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <h1>changement du statut</h1>
+{% if accepted is defined and successMail is defined%}
+
+    <p style="color:green">le statut du viewer {{ user.name }} est bien passé à <str>streamer</str> et l'email de confirmation est bien parti</p>    
+
+{% endif %}
+{% if accepted is defined and errorsMail is defined %}
+
+<p style="color:green">le statut du viewer {{ user.name }} est bien passé à <str>streamer</str> mais l'email de confirmation a rencontré un problème interne</p>    
+{% endif %}
+
+{% if refused is defined and successMail is defined%}
+    <p style="color:blue">le statut du viewer {{ user.name }} est bien passé à <str>en attente</str> et le mail de refus est bien parti</p>
+{% endif %}
+{% if refused is defined and errorsMail is defined %}
+    <p style="color:blue">le statut du viewer {{ user.name }} est bien passé à <str>en attente</str> mais le mail de refus a rencontré un problème interne</p>
+
+{% endif %}
+
+
+{% endblock %}

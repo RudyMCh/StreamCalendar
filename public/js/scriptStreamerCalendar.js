@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 calendar.refetchEvents();
                             }else{
                                 console.log(data.errors)
-                                setError($(".info"), "erreur bdd");
+                                $('#bloodhound').append('<p class="danger">ce jeux ne fait pas parti de vos favoris</p>')
                             }
                         },
                         error: function(data){

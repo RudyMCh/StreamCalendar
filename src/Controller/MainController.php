@@ -25,7 +25,8 @@ class MainController extends AbstractController{
     public function home(){
 
         $title = $this->getParameter('site_title');
-
+        $token = md5(rand());
+        dump($token);
         return $this->render('index.html.twig', array('title' => $title));
     }
     /**
@@ -353,7 +354,9 @@ class MainController extends AbstractController{
             $start = $request->request->get('start');
             $end = $request->request->get('end');
             $description = $request->request->get('description');
-            if(!preg_match('#^.{1,50}$#i',$title)){
+            $ar= $this->getDoctrine()->getRepository(Activity::class);
+            $activity=$ar->findOneByName($title);
+            if(empty($activity)){
                 $errors['title']= true;
             }
             if(!preg_match('#^.{0,1000}$#i', $description)){
@@ -665,6 +668,128 @@ class MainController extends AbstractController{
         //     return $this->json(["success" => false]);
         // } 
     }
+
+
+    /**
+     * @Route("/demande-passage-a-streamer/", name="isInProcess")
+     * 
+     */
+    public function isInProcess(){
+        $session=$this->get('session');
+        if(!$session->has('account') || $session->get('account')->getType()!=2){
+
+            throw new NotFoundHttpException('non autorisé'); 
+        }else{
+            $ur = $this->getDoctrine()->getRepository(User::class);
+            $InProcessList = $ur->findByInProcess(1);
+            if(empty($InProcessList)){
+                return $this->render('isInProcess.html.twig');
+            }else{
+
+                return $this->render('isInProcess.html.twig', array('inProcessList' => $InProcessList));
+            }
+
+        }
+    }
+    
+    /**
+     * @Route("/levelUp/{id}/{tokenInProcess}/{result}/", name="levelUp", requirements={"id"="[1-9][0-9]{0,10}", "tokenInProcess"=".{32}", "result"="(accepted|refused)"})
+     * 
+     * fonction pour valider ou non le passage à streamer d'un viewer
+     */
+
+    public function levelUp($id, $tokenInProcess, $result,  Swift_Mailer $mailer ){
+        $session=$this->get('session');
+        if(!$session->has('account') || $session->get('account')->getType()!=2){
+            dump($session->get('account')->getType());
+            throw new NotFoundHttpException('non autorisé'); 
+        }else{
+            if($result == "refused"){
+                $ur = $this->getDoctrine()->getRepository(User::class);
+                $user=$ur->findOneById($id);
+                if($tokenInProcess!= $user->getTokenInProcess()){
+                    throw new NotFoundHttpException('token invalide');
+                }
+                $user->setInProcess(2);
+                $um = $this->getDoctrine()->getManager()->flush();
+                $message= (new Swift_Message('mail de confirmation Streamer'))
+                            ->setFrom("nous@gmail.com")
+                            ->setTo($user->getEmail())
+                            ->setBody(
+                                $this->renderView('emails/refusedStreamer.html.twig', array(
+                                    "user" => $user,
+                                )),
+                                'text/html'
+                                )
+                            ->addPart(
+                                $this->renderView('emails/refusedStreamer.txt.twig', array(
+                                    "user" => $user,
+                                )),
+                                'text/plain'
+                            )
+                ;
+                $status = $mailer->send($message);
+                if($status){
+                    return $this->render('levelUp.html.twig', array(
+                        'successMail' => true,
+                        "user" => $user,
+                        'refused'=> true
+                ));
+                }else{
+                    $errors['errorMail'] = true;
+                    return $this->render('levelUp.html.twig', array(
+                        'errorsMail' => true,
+                        "user" => $user,
+                        'refused'=> true
+                    ));
+                }
+            }
+            if($result == "accepted"){
+                $ur = $this->getDoctrine()->getRepository(User::class);
+                $user=$ur->findOneById($id);
+                if($tokenInProcess!= $user->getTokenInProcess()){
+                    throw new NotFoundHttpException('token invalide');
+                }
+                $user->setInProcess(0);
+                $user->setType(1);
+                $um = $this->getDoctrine()->getManager()->flush();
+                $message= (new Swift_Message('mail de confirmation Streamer'))
+                            ->setFrom("nous@gmail.com")
+                            ->setTo($user->getEmail())
+                            ->setBody(
+                                $this->renderView('emails/confirmationStreamer.html.twig', array(
+                                    "user" => $user,
+                                )),
+                                'text/html'
+                                )
+                            ->addPart(
+                                $this->renderView('emails/confirmationStreamer.txt.twig', array(
+                                    "user" => $user,
+                                )),
+                                'text/plain'
+                            )
+                ;
+                $status = $mailer->send($message);
+                if($status){
+                    return $this->render('levelUp.html.twig', array(
+                        'successMail' => true,
+                        'user'=> $user,
+                        "accepted" => true
+                ));
+                }else{
+                    $errors['errorMail'] = true;
+                    return $this->render('levelUp.html.twig', array(
+                        'errorsMail' => true,
+                        'user'=> $user,
+                        "accepted" => true
+                    ));
+                }
+            }
+
+        }
+
+    }
+
     
     /**
      * @Route("/record-favorite/", name="recordFavorite")
