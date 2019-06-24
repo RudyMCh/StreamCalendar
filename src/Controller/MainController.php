@@ -38,6 +38,7 @@ class MainController extends AbstractController{
 
         return $this->render('index.html.twig', array('title' => $title));
     }
+
     /**
      * @Route("/mon-calendrier/", name="myCalendar")
      */
@@ -80,13 +81,11 @@ class MainController extends AbstractController{
                     $errors['email'] =  true;
                 }
                 if(!preg_match('#^.{8,320}$#i', $password)){
-                    dump($password);
                     $errors['password'] = true;
                 }
                 if(!isset($errors)){
                     $userRepo = $this->getDoctrine()->getRepository(User::class);
                     $user = $userRepo-> findOneByEmail($email);
-                    dump($user);
                     if(!empty($user)){
                         $passwordVerif = $user->getPassword();
                         if(password_verify($password, $passwordVerif)){
@@ -95,7 +94,7 @@ class MainController extends AbstractController{
                                 return $this->render('login.html.twig', ["errors" => $errors]);
                             }else{
                                 $session->set('account', $user);
-
+                                dump($session);
                                 return $this->render('login.html.twig', array('success'=>true));
                             }
                         }                        
@@ -112,7 +111,7 @@ class MainController extends AbstractController{
         }
     }
 
-        /**
+    /**
      * @Route("/se-deconnecter/", name="logout")
      */
     public function logout(){
@@ -126,7 +125,7 @@ class MainController extends AbstractController{
     }
 
     /**
-     * @Route("/inscription", name="register")
+     * @Route("/inscription/", name="register")
      */
     public function register(Request $request, Swift_Mailer $mailer){
 
@@ -229,7 +228,7 @@ class MainController extends AbstractController{
     }
 
     /**
-     * @Route("/extraction", name="extract")
+     * @Route("/extraction/", name="extract")
      */
     public function extract()
     {   
@@ -258,7 +257,7 @@ class MainController extends AbstractController{
     }
 
     /**
-     * @Route("/extractStreamer", name="extractStreamer")
+     * @Route("/extractStreamer/", name="extractStreamer")
      */
     public function extractStreamer(Request $request){
         $name= $request->request->get('name');
@@ -284,7 +283,7 @@ class MainController extends AbstractController{
     }
 
     /**
-     * @Route("/extractFavoritesEvents",name="extractFavoritesEvents" )
+     * @Route("/extractFavoritesEvents/",name="extractFavoritesEvents" )
      */
     public function extractFavoritesEvents(){
         $session=$this->get('session');
@@ -318,7 +317,7 @@ class MainController extends AbstractController{
     }
     
     /**
-     * @Route("/insertion", name="insert")
+     * @Route("/insertion/", name="insert")
      */
     public function insert(Request $request)
     {
@@ -392,6 +391,7 @@ class MainController extends AbstractController{
             return $this->json(['error' =>true]);
         }
     }
+
     /**
      * @Route("/mise-a-jour-resize/", name="updateResize")
     */
@@ -429,60 +429,120 @@ class MainController extends AbstractController{
      * @Route("/mon-calendrier-viewer/", name="viewerCalendar")
      */
     public function viewerCalendar(){
-        $session= $this->get('session');
-        if(!$session->has('account')){
-            return $this->redirectToRoute('login');
-        }else{
-            $er = $this->getDoctrine()->getRepository(User::class);
-            $streamers = $er->findByType(1); // seeking for streamer only
+    $session= $this->get('session');
+    if(!$session->has('account')){
+    return $this->redirectToRoute('login');
+    }
+    // we fetch ourself !
+    $user = $session->get('account');
+    $em = $this->getDoctrine()->getManager();
+    $user = $em->merge($user);
+    // we fetch and load the favorite streamers list for further sending to the view
+    $favStream = $user->getFavorite();
 
-            foreach ($streamers as $streamer){
-                $list[] = $streamer->getName();
-            }
-            dump($list);
-            
-            return $this->render('viewerCalendar.html.twig', array("streamerList" => $list));
-        }
+    return $this->render('viewerCalendar.html.twig', array("favStream" => $favStream));
+    
     }
 
     /**
-     * @Route("/viewer-profile/", name="viewerProfile")
+     * @Route("/mon-profil-viewer/", name="viewerProfile")
      */
     public function viewerProfile(Request $request){
         $session= $this->get('session');
         if(!$session->has('account')){
             return $this->redirectToRoute('login');
-        }else{
-            $choice = $request->request->get('name');
-            
-            //appel des variables
-            if ($request->isMethod('post')) {
-                //bloc des vérifs
-                if(!preg_match('#^.{0,100}$#i', $choice)){
-                    $errors['choix'] = true;
-                    dump($choice);
-                } else {
-                    dump($choice);
-                }
-                
-            }
-
-            $er = $this->getDoctrine()->getRepository(User::class);
-            $streamers = $er->findByType(1); // seeking for streamer only
-
-            foreach ($streamers as $streamer){
-                $list[] = $streamer->getName();
-            }
-            //dump($list);
-            
-            return $this->render('viewerProfile.html.twig', array("streamerList" => $list));
         }
+                
+        //listing out all variables
+        if ($request->isMethod('post')) {
+            $name = $request->request->get('name');
+            $email = $request->request->get('email');
+            //verifications
+            if(!preg_match('#^.{2,100}$#i', $name)){
+                $errors['name'] = true;
+            }
+            if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+                $errors['email'] = true;
+            }
+            //if no error
+            if(!isset($errors)){
+                $userVerif = $er->findOneByEmail($email); // we check ou whether or not the email is already existing
+                $em = $this->getDoctrine()->getManager();
+                $user = $this->get('session')->get('account');
+                $user = $em->merge($user);              // we fetch the connected user
+                if(empty($userVerif)){  // if the email wasn't existing so we can modify it
+                    $user->setEmail($email);
+                } else {
+                    $errors['alreadyUsed'] = true;
+                }
+                $user->setName($name);  // in any case we modify the name
+                // then we save values in the database and we update session variables
+                $em->flush();
+                $session->set('account', $user);
+            }
+            if(isset($errors)){
+                return $this->render('viewerProfile.html.twig', array('errors' => $errors));
+            } else {
+                return $this->render('viewerProfile.html.twig');
+            }
+        }
+        return $this->render('viewerProfile.html.twig');
     }
 
+    /**
+     * @Route("/viewer-favoris-streamers/", name="viewerFavStream")
+     * page for managing the favorites streamers
+     */
+    public function viewerFavStream(Request $request){
+        $session= $this->get('session');
+        if(!$session->has('account')){
+            return $this->redirectToRoute('login');
+        }
+        // we fetch all streamers from the database (type = 1)
+        $er = $this->getDoctrine()->getRepository(User::class);
+        $streamers = $er->findByType(1);
+
+        // we load the list for further sending to the view for typeahead feature
+        foreach ($streamers as $streamer){
+            $list[] = $streamer->getName();
+        }
+        //listing out all variables
+        if ($request->isMethod('post')) {
+            $name = $request->request->get('name');
+            //verifications
+            if(!preg_match('#^.{2,100}$#i', $name)){
+                $errors['name'] = true;
+            }
+            //if no error
+            if(!isset($errors)){
+                $str=$er->findOneByName($name);
+                // if favorite was found so we save it in the database
+                if (!empty($str)) {
+                    $user = $session->get('account');
+                    $em = $this->getDoctrine()->getManager();
+                    $user = $em->merge($user); // we make a merge because user is coming out from the session and is not fully understood 
+                    $user->addFavorite($str);
+                    $em->flush();
+                    dump($user);
+                    dump($str);
+                    return $this->render('viewerFavStream.html.twig', ['success'=>true, 'streamerList' => $list]);
+                } else {
+                    $errors['notexist']=true;
+                    return $this->render('viewerFavStream.html.twig', ['errors'=> $errors, 'streamerList' => $list]);
+                }
+            }
+            if(isset($errors)){
+                return $this->render('viewerFavStream.html.twig', array('errors' => $errors, 'streamerList' => $list));
+            } else {
+                return $this->render('viewerFavStream.html.twig', array("streamerList" => $list));
+            }
+        }
+
+        return $this->render('viewerFavStream.html.twig', array("streamerList" => $list));
+    }    
 
     /**
-     * @Route("/administration-backend", name="adminBackend")
-     * Page
+     * @Route("/administration-backend/", name="adminBackend")
      */
     public function adminBackend(Request $request, Swift_Mailer $mailer){
 
