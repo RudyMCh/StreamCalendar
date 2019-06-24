@@ -13,6 +13,17 @@ h1, h2, h3, h4, h5, h6{
     color : #FFFF;
     font-weight: bold;
 }
+.navbar{
+    z-index: 1;
+    margin:0;
+    padding:0;
+    min-height: 5em;
+    background-color: rgba(197, 170, 17, 0.7) !important;
+    -webkit-background-size: cover;
+    background-size: cover;
+    position: sticky;
+    top: 0;  
+ }
 
 #carrou {
     width : 80%;
@@ -21,11 +32,11 @@ h1, h2, h3, h4, h5, h6{
 body,html{
     height:100%;
     margin: 0;
-	padding: 0;
+    padding: 0;
+    
 }
 /* conteneur pour forcer le footer en bas de la page */
 .pageperso{
-    width: 80%;
     margin: 0 auto;
     min-height: 100%;
 }
@@ -34,6 +45,10 @@ footer{
     width:100%;
     bottom:0; left:0;
     color : white;
+}
+
+footer.bg-primary{
+    background-color:rgba(197, 170, 17, 0.7) !important;
 }
 
 h1{
@@ -115,4 +130,71 @@ table .table-bordered{
             box-shadow: 0 5px 10px rgba(0,0,0,.2);
   }
 
+  /*-----------CSS FRONT-------------------------*/
+  .slide1 {
+    width:100%;
+    height:100%;
+   min-height: 35em;
+    background: url("../img/apex-legends_0640038401658422.jpg") center 0 no-repeat fixed;
+    -webkit-background-size: cover;
+    background-size: cover;
+ }
+ .slide3 {
+    margin:0;
+   padding:0;
+   width:100%;
+   min-height: 30em;
+    background: url("../img/apex-legends_0640038401658422.jpg") center 0 no-repeat fixed;
+    -webkit-background-size: cover;
+    background-size: cover;
+ }
+
+ /*-------------Effet Flip-box-----------*/
+ .flip-box {
+    background-color: transparent;
+    width: 100%;
+    height: 500px;
+   /* Remove perspective this if you dont't want the 3D effect */
+    perspective: 2500px; 
+  }
   
+  /* This container is needed to position the front and back side */
+  .flip-box-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+  }
+  
+  /* Do an horizontal flip when you move the mouse over the flip box container */
+  .flip-box:hover .flip-box-inner {
+    transform: rotateY(180deg);
+  }
+  
+  /* Position the front and back side */
+  .flip-box-front, .flip-box-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+  }
+  
+  /* Style the front side */
+  .flip-box-front {
+    background : url("../img/img1.jpg") center 0 no-repeat fixed;
+     /* width:100%; */
+     /* height:100%; */
+   
+    color: white;
+  }
+  
+  /* Style the back side */
+  .flip-box-back {
+    background: url("../img/dota2.jpg") center 0 no-repeat fixed;
+    /* width:100%;
+    height:100%; */
+    color: white;
+    transform: rotateY(180deg);
+  }
