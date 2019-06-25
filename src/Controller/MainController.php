@@ -488,7 +488,6 @@ class MainController extends AbstractController{
     $favStream = $user->getFavorite();
 
     return $this->render('viewerCalendar.html.twig', array("favStream" => $favStream));
-    
     }
 
     /**
@@ -499,7 +498,7 @@ class MainController extends AbstractController{
         if(!$session->has('account')){
             return $this->redirectToRoute('login');
         }
-                
+        dump($session);
         //listing out all variables
         if ($request->isMethod('post')) {
             $name = $request->request->get('name');
@@ -587,6 +586,29 @@ class MainController extends AbstractController{
         return $this->render('viewerFavStream.html.twig', array("streamerList" => $list));
     }
     
+    /**
+     * @Route("/evolution-profil/", name="viewer2streamer")
+     */
+    public function viewer2streamer(){
+        $session= $this->get('session');
+        if(!$session->has('account')){
+            return $this->redirectToRoute('login');
+        }
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->get('session')->get('account');
+        $user = $em->merge($user);              // we fetch the connected user
+        dump($user);
+        $user->setInProcess('1');
+        $user->setTokenInProcess(md5(rand()));
+        $em->flush();
+        $session->set('account', $user); // we update the session variable
+          
+
+
+        return $this->redirectToRoute('viewerProfile');
+
+    }
+
     /**
      * @Route("/mon-profil-streamer/", name="streamerProfil")
      */

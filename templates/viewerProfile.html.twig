@@ -16,6 +16,13 @@
         <div id="view" class="col-md-4" style="min-height:100px;">
             <p class="text-center">Twitch ID: {% if app.session.get('account').twitchId %} défini {% else %} pas défini {% endif %}</p>
             <p class="text-center">Image de profil:{% if app.session.get('account').profilImage %} <img style="width:50px;" src="{{asset(app.session.get('account').profilImage)}}" alt="image de profil"> {% else %} <img style="width:50px;" src="{{asset('img/inconnu.svg')}}" alt="image de profil"> {% endif %}</p>
+        {% if app.session.get('account').inProcess == 1 %}
+            <p>Votre demande pour devenir streamer est en cours de traitement</p>
+        {% elseif app.session.get('account').type == 2 %}
+            <p>Désolé, votre demande pour évoluer vers un profil streamer a été rejetée</p>
+        {% elseif app.session.get('account').type == 0 %}
+            <p>Vous pouvez faire évoluer votre compte vers un profil streamer en cliquant <a href="{{ path('viewer2streamer') }}">içi</a></p>
+        {% endif %}
         </div>
 
         <div class="info col-md-4" style="min-height:100px;">
