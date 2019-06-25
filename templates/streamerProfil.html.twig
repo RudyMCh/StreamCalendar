@@ -1,0 +1,56 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<h1>Mon profil streamer</h1>
+
+
+<h2>{{ name }}</h2>
+<p>mon id twitch : {{ twhitchId }}</p>
+<h2>Mes activités</h2>
+<ul>
+{% for item in activity %}
+    <li>{{ item.name }}</li>
+{% endfor %}
+</ul>
+<img style="border-radius: 8px" src="{{ imgProfil }}" alt="avatar de {{ name }}">
+
+
+<form action="{{ path('streamerProfil') }}" method="POST" class="form-group">
+    <div >
+        <label for="activity">ajouter une activité</label>
+        <input id="bloodhound" class="typeahead form-control" type="text" placeholder="activité" name="activity">
+    </div>
+    <input type="submit" clas="btn btn-primary">
+</form>
+    
+{% endblock %}
+
+
+{% block javascripts %}
+<script src="{{ asset('js/typeahead.bundle.js') }}"></script>   
+<script>
+    // constructs the suggestion engine
+var activityList = {{ activityList|escape|json_encode|raw }};
+//var activityList = ['test'];
+var activity = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.whitespace,
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    
+    local: activityList
+});
+
+$('#bloodhound.typeahead').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1
+},
+{
+    name: 'activity',
+    source: activity
+});
+
+
+
+</script>
+
+{% endblock %}

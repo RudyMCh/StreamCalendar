@@ -78,11 +78,22 @@ class User
      */
     private $users;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Activity", inversedBy="users")
+     */
+    private $activity;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $tokenInProcess;
+
     public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->favorite = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->activity = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -279,6 +290,44 @@ class User
             $this->users->removeElement($user);
             $user->removeFavorite($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Activity[]
+     */
+    public function getActivity(): Collection
+    {
+        return $this->activity;
+    }
+
+    public function addActivity(Activity $activity): self
+    {
+        if (!$this->activity->contains($activity)) {
+            $this->activity[] = $activity;
+        }
+
+        return $this;
+    }
+
+    public function removeActivity(Activity $activity): self
+    {
+        if ($this->activity->contains($activity)) {
+            $this->activity->removeElement($activity);
+        }
+
+        return $this;
+    }
+
+    public function getTokenInProcess(): ?string
+    {
+        return $this->tokenInProcess;
+    }
+
+    public function setTokenInProcess(?string $tokenInProcess): self
+    {
+        $this->tokenInProcess = $tokenInProcess;
 
         return $this;
     }

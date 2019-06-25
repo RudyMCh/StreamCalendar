@@ -1,29 +1,29 @@
 $(function(){
 
-    // constructs the suggestion engine
+    // // constructs the suggestion engine
 
-    var listStreamerJS = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.whitespace,
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      // `states` is an array of state names defined in "The Basics"
-      local: listStreamer
-    });
+    // var listStreamerJS = new Bloodhound({
+    //   datumTokenizer: Bloodhound.tokenizers.whitespace,
+    //   queryTokenizer: Bloodhound.tokenizers.whitespace,
+    //   // `states` is an array of state names defined in "The Basics"
+    //   local: listStreamer
+    // });
 
-    $('#favoriteStreamer .typeahead').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1
-    },
-    {
-      name: 'listStreamerJS',
-      source: listStreamerJS
-    });
+    // $('#favoriteStreamer .typeahead').typeahead({
+    //   hint: true,
+    //   highlight: true,
+    //   minLength: 1
+    // },
+    // {
+    //   name: 'listStreamerJS',
+    //   source: listStreamerJS
+    // });
 
-    var selectedStreamer;
+    // var selectedStreamer;
 
-    $('.typeahead').on('typeahead:selected', function(event, datum) {
-      selectedStreamer = datum;
-    });
+    // $('.typeahead').on('typeahead:selected', function(event, datum) {
+    //   selectedStreamer = datum;
+    // });
     
       // $('form').submit(function(e){
       //   e.preventDefault();
@@ -84,31 +84,44 @@ $(function(){
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         eventRender: function(info) {
-            var tooltip = new Tooltip(info.el, {
-                title: info.event.extendedProps.description,
-                placement: 'top',
-                trigger: 'hover',
-                container: 'body'
-            });
+            // var tooltip = new Tooltip(info.el, {
+            //     title: info.event.extendedProps.description,
+            //     placement: 'top',
+            //     trigger: 'hover',
+            //     container: 'body'
+            // });
+            // console.log(info);
+            // if(info.event._def.extendedProps.streamer==1){
+            //   info.el.css("color","red");
+            // }
+
         },
-        eventMouseEnter: function(mouseEnterInfo){
-            console.log(mouseEnterInfo);
-            $(mouseEnterInfo.el).css('background-color', 'black');
+        // eventMouseEnter: function(mouseEnterInfo){
+        //     $(mouseEnterInfo.el).css('background-color', 'black');
             
-        },
-        eventMouseLeave: function(mousEventLeave){
-            $(mousEventLeave.el).css('background-color', 'orange');
+        // },
+        // eventMouseLeave: function(mousEventLeave){
+        //     $(mousEventLeave.el).css('background-color', 'orange');
+        // },
+        loading: function(isLoading, view){
+          if(isLoading){
+            console.log("loading");
+            //setOverlay();
+          }else{
+            console.log("fini de loading");
+            //removeOverlay();
+          }
         },
         events:{
-          url: extractFavoritesEvents,
-          color: 'orange'
+          url: extractFavoritesEvents
         },
         timeZone: 'UTC',
         themeSystem: 'bootstrap',
         
         
         eventClick: function(info){
-            console.log(info);
+            console.log(info.event._def.title);
+            console.log(info.event._def.extendedProps.description);
         }
     });
     calendar.render();

@@ -42,6 +42,11 @@ class Event
      */
     private $streamer;
 
+    /**
+     * @ORM\Column(type="string", length=7, nullable=true)
+     */
+    private $color;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -103,6 +108,18 @@ class Event
     public function setStreamer(?User $streamer): self
     {
         $this->streamer = $streamer;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): self
+    {
+        $this->color = $color;
 
         return $this;
     }
