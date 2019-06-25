@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\User;
+use App\Entity\Activity;
 use App\Entity\Event;
 use \DateTime;
 use App\Service\Recaptcha;
@@ -112,7 +113,7 @@ class MainController extends AbstractController{
         }
     }
 
-        /**
+    /**
      * @Route("/se-deconnecter/", name="logout")
      */
     public function logout(){
@@ -481,107 +482,118 @@ class MainController extends AbstractController{
 
 
     /**
-     * @Route("/administration-backend", name="adminBackend")
-     * Page
+     * @Route("/administration-backend/", name="adminBackend")
      */
     public function adminBackend(Request $request, Swift_Mailer $mailer){
 
-        //     //vérification si déjà connecté
-        //     $session = $this->get('session');
+        //vérification si déjà connecté
+            $session = $this->get('session');
     
-        //     if(!$session->has('account')){
-        //         return $this->redirectToRoute('login');
+            if(!$session->has('account')){
+                return $this->redirectToRoute('login');
+            }
+
+            if($session->has('account')){
+                $type = $session->get('account')->getType();
+                if($type!=2){
+                    throw new NotFoundHttpException('accès non autorisé');
+                }else{
+                    return $this->render('adminBackend.html.twig');
+                }
+            }
     
-        //     }
-        //     if($session->has('account')){
-        //         $type = $session->get('account')->getType();
-        //         if($type!=2){
-        //             throw new NotFoundHttpException('accès non autorisé');
-        //         }else{
-        //             return $this->render('adminBackend.html.twig');
-        //         }
-        //     }
-    
-        //    // return $this->render('adminBackend.html.twig');
-        // //}
-    
-        // // /**
-        // //  * @Route("/admin-maj-game", name="updateGames")
-        // //  */
-        // // public function updateGames(Request $request)
-        // //{
-        //     //vérification si déjà connecté
-        //     //$session= $this->get('session');
-        //     //$user =$session->get('account');
-            
-        //     // Récupération données JSON
-        //     $gameRepo = $this->getDoctrine()->getRepository(Activity::class);
-        //     $games = $gameRepository->findById($twitch_code);
-        //     if(empty($games)){
-        //         return $this->json(['empty' =>true]);
-        //     }else{ 
-        //         foreach($games as $game){
-        //             $gamesArray[] = [
-        //                 'data.data.id' => $game->getId(),
-        //                 'data.data.name' => $game->getName(),
-        //                 'data.data.box_art_url' => $game->getGame_image()
-        //             ];
-        //         }
-        //         var_dump(json_decode($gamesArray));
-        //         return $this->json($gamesArray);
-        //         dump(json_decode($game));
-        //     }
-        //     // appel des variables
-        //     if($request->isMethod('post')){
-            
-        //         // Récupération données post
-        //         $twitch_code = $request->request->get('id');
-        //         $name = $request->request->get('name');
-        //         $game_image = $request->request->get('box_art_url');
-                
-        //         if(!preg_match('#^[0-9]{1,20}$#i',$twitch_code)){
-        //             $errors['id']= true;
-        //         }
-        //         if(!preg_match('#^.{2,255}$#i',$name)){
-        //             $errors['name']= true;
-        //         }
-        //         if(!preg_match('#^.{2,350}$#i',$game_image)){
-        //             $errors['box_art_url']= true;
-        //         }
-                
-        //         // Si pas d'erreurs
-        //         if(!isset($errors)){
-    
-        //         // Verif si existe pas
-        //         $gameRepo = $this->getDoctrine()->getRepository(Activity::class);
-    
-        //         $gamesIfExist = $gameRepo->findById($twitch_code);
-    
-        //         if(empty($gamesIfExist)){
-    
-        //             // Création d'un nouveau jeu
-        //             $newGames = new Activity();
-        //             // on hydrate $newGames
-        //             $newGames
-        //                 ->setId($twitch_code)
-        //                 ->setName($name)
-        //                 ->setBox_art_url($game_image)
-        //             ;
-        //             // Récupération du manager des entités
-        //             $em = $this->getDoctrine()->getManager();
-        //             $em->merge($newGames);
-        //             $em->flush();
-        //         }
-        //     }
-        //     return $this->json(["success" => true]);
-        // } else {
-        //     return $this->json(["success" => false]);
-        // } 
-    }
+            return $this->render('adminBackend.html.twig');
+        }
     
     /**
-     * @Route("/record-favorite/", name="recordFavorite")
-     */
+    * @Route("/admin-maj-game/", name="updateGames")
+    */
+    public function updateGames(Request $request){
+
+             //vérification si déjà connecté
+            $session= $this->get('session');
+            if(!$session->has('account')){
+                return $this->redirectToRoute('login');
+            }
+
+            if($session->has('account')){
+                $type = $session->get('account')->getType();
+                if($type!=2){
+                    throw new NotFoundHttpException('accès non autorisé');
+                }
+                // appel des variables
+                if($request->isMethod('post')){
+                    // Récupération données post
+                    $twitch_code = $request->request->get('id');
+                    $name = $request->request->get('name');
+                    $game_image = $request->request->get('pic');
+                    $gameRepo = $this->getDoctrine()->getRepository(Activity::class);        
+                    $gamesIfExist = $gameRepo->findOneById($twitch_code);
+
+                    if (!empty($gamesIfExist)){
+                        $errors['AlreadyExist']= true;
+                    }
+
+                    if(!preg_match('#^[0-9]{1,20}$#',$twitch_code)){
+                        $errors['twitchId']= true;
+                    }
+                    if(!preg_match('#^.{2,255}$#',$name)){
+                        $errors['game']= true;
+                    }
+                    if(!preg_match('#^.{2,350}$#',$game_image)){
+                        $errors['link']= true;
+                    }
+                    // Si pas d'erreurs
+                    if(!isset($errors)){    
+                        // Création d'un nouveau jeu
+                        $newGames = new Activity();
+                    // on hydrate $newGames
+                        $newGames
+                            ->setTwitchCode($twitch_code)
+                            ->setName($name)
+                            ->setGameImage($game_image)
+                        ;
+                    // Récupération du manager des entités
+                        $em = $this->getDoctrine()->getManager();
+                        $em->persist($newGames);
+                        $em->flush();
+                        return $this->render('updateGames.html.twig', ['success' => true]);
+                    }
+                }
+                return $this->render('updateGames.html.twig',['errors' => false]); 
+            } 
+        return $this->render('updateGames.html.twig');
+        }   
+    
+
+
+    ///**
+    //* @Route("/admin-maj-streamer", name="updateStreamer")
+    //*/
+    //public function updateStreamer(Request $request){
+    //      $session= $this->get('session');
+
+            //if(!$session->has('account')){
+                //return $this->redirectToRoute('login');
+            //}
+
+            //if($session->has('account')){
+                //$type = $session->get('account')->getType();
+            //if($type!=2){
+                //throw new NotFoundHttpException('accès non autorisé');
+            //}else{
+
+
+                //return $this->render('adminBackend.html.twig');
+        //}
+    //}
+    //}
+
+
+
+    /**
+    * @Route("/record-favorite/", name="recordFavorite")
+    */
     public function recordFavorite(Request $request){
 
         if ($request->isMethod('post')) {
@@ -593,12 +605,7 @@ class MainController extends AbstractController{
             $userMyself->addFavorite($user);
             $this->getDoctrine()->getManager()->flush();
             return $this->json(["success" => true]);
-
-
         }
-
-
-
     }
-
 }
+

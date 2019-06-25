@@ -45,12 +45,6 @@
                     </li>
                 {% endif %}
                 
-                <!-- session Administration adminBackend -->
-                {% if app.session.has('account') and app.session.get('account').type == 2 %}
-                    <li class="nav-item {% if  way =='adminBackend' %} active bg-success rounded{% endif %}">
-                        <a class="nav-link " href="{{ path('adminBackend')}}">Administration</a>
-                    </li>
-                {% endif %}
                 <!-- logout -->
                 {% if app.session.has('account') %}
                     <li class="nav-item {% if  way =='logout' %} active bg-success rounded{% endif %}">
@@ -63,6 +57,19 @@
                     <li class="nav-item {% if  way =='register' %} active bg-success rounded{% endif %}">
                         <a class="nav-link " href="{{ path('register')}}">inscription</a>
                     </li>
+                {% endif %}
+
+                <!-- session Administration adminBackend -->
+                {% if app.session.has('account') and app.session.get('account').type == 2 %}
+                    <li class="nav-item {% if  way =='adminBackend' %} active bg-success rounded{% endif %}">
+                        <a class="nav-link" href="{{ path('adminBackend')}}">Administration</a>
+                    
+                        <div class="nav justify-content-end">
+                            <li class="nav-item {% if  way =='upadteGames' %} active bg-success rounded{% endif %}">
+                                <a class="nav-link" href="{{ path('updateGames')}}">Update Games</a>
+                            </li>
+                        </div>
+                    </li> 
                 {% endif %}
                 </ul>
             </div>
