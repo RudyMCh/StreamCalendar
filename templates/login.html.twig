@@ -1,45 +1,41 @@
 {% extends "base.html.twig" %}
 {% block title %}
-    connexion
+connexion
 {% endblock %}
 {% block body %}
 <div class="container-fluid">
     <div class="row">
-            <div class="col-md-4">    
-            </div>
-                <div class="col-md-4 boxLogin">
-                    <h1>Connexion</h1>
-                    {# formulaire de connexion bootstrap #}
-                    {% if success is defined %}
-                        <p style="color:green">vous êtes bien connecté</p>
-                        
-                    {% else %}
-                        <form class="form-group" action="{{ path('login') }} " method="POST">
-                            <fieldset>
-                                <label for="email">email</label>
-                                <input class="form-control" type="text" name="email" placeholder="email">
-                                {% if errors.email is defined %}
-                                    <p style="color:red";>email invalide</p>
-                                {% endif %}
-                                    <label for="password">password</label>
-                                    <input class="form-control" type="password" name="password" placeholder="password">
-                                {% if errors.password is defined %}
-                                    <p style="color:red";>mot de passe invalide</p>
-                                {% endif %}
-                                {% if errors.login is defined %}
-                                    <p style="color:red";>email ou mot de passe incorrect</p>
-                                {% endif %}
-                                {% if errors.inactiveAccount is defined %}
-                                    <p style="color:red";>Veuillez activer votre compte</p>
-                                {% endif %}
-                                    <input class="btn btn-primary col-12 col-md-4 mt-3" type="submit" value="Valider">
-                            </fieldset>
-                        </form>
-                </div>
-            <div class="col-md-4">    
-            </div>     
+        <div class="col-md-4 offset-md-4 boxLogin">
+            <h1>Connexion</h1>
+            {# formulaire de connexion bootstrap #}
+            {% if success is defined %}
+                <p style="color:green">vous êtes bien connecté</p>
+
+            {% else %}
+                <form class="form-group" action="{{ path('login') }} " method="POST">
+                    <fieldset>
+                        <label for="email">email</label>
+                        <input class="form-control" type="text" name="email" placeholder="email">
+                        {% if errors.email is defined %}
+                        <p style="color:red" ;>email invalide</p>
+                        {% endif %}
+                        <label for="password">password</label>
+                        <input class="form-control" type="password" name="password" placeholder="password">
+                        {% if errors.password is defined %}
+                        <p style="color:red" ;>mot de passe invalide</p>
+                        {% endif %}
+                        {% if errors.login is defined %}
+                        <p style="color:red" ;>email ou mot de passe incorrect</p>
+                        {% endif %}
+                        {% if errors.inactiveAccount is defined %}
+                        <p style="color:red" ;>Veuillez activer votre compte</p>
+                        {% endif %}
+                        <input class="btn btn-primary col-12 col-md-4 mt-3" type="submit" value="Valider">
+                    </fieldset>
+                </form>
+            {% endif %}
+        </div>
     </div>
 </div>
 
-{% endif %} 
 {% endblock %}
