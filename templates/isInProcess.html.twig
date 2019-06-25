@@ -11,27 +11,24 @@
         <li>{{ inProcess.email }}</li>
         <li>{{ inProcess.type }}</li>
         <li>{{ inProcess.tokenInProcess }}</li>
-        <a href="{{ path('levelUp', { "id" : inProcess.id, "tokenInProcess" : inProcess.tokenInProcess, "result": "accepted"}) }}">cliquez ici pour authoriser le passage à streamer</a><br>
+        <p>page twitch de {{ inProcess.name }} <a href="https://twitch.tv/{{inProcess.name }}">ici</a></p>
+        <a id="twitch" href="{{ path('levelUp', { "id" : inProcess.id, "tokenInProcess" : inProcess.tokenInProcess, "result": "accepted"}) }}">cliquez ici pour authoriser le passage à streamer</a><br>
         <a href="{{ path('levelUp', { "id" : inProcess.id, "tokenInProcess" : inProcess.tokenInProcess, "result":"refused"}) }}">cliquez ici pour refuser le passage à streamer</a>
     </ul>
+
 {% endfor %}
 
     {% else %}
-        <p>il n'y a aucune demande d'élévation de statut actuellement</p>
+        <p class="text-center">il n'y a aucune demande d'élévation de statut actuellement</p>
 {% endif %}
 
     
 {% endblock %}
 
 {% block javascripts %}
-<script src="{{ asset('js/script-api.js') }}"></script>
-<script>
-
-
-
-
-</script>
-
-
-
+<script src="{{ asset('js/scriptLevelup.js') }}"></script>
+<script> 
+    var targetUpdateStreamer = '{{ url('updateStreamer') }}'
+    
+    </script>
 {% endblock %}

@@ -55,9 +55,6 @@ class MainController extends AbstractController{
                     $activityList[]=$activity->getName();
                 }
                 dump($activityList);
-
-
-
                 return $this->render('myCalendar.html.twig', array("activities" => $activityList));
             }
         }
@@ -738,6 +735,8 @@ class MainController extends AbstractController{
     /**
      * @Route("/demande-passage-a-streamer/", name="isInProcess")
      * 
+     * page permettant d'afficher tous les user en demande de passage à streamer
+     * 
      */
     public function isInProcess(){
         $session=$this->get('session');
@@ -753,7 +752,6 @@ class MainController extends AbstractController{
 
                 return $this->render('isInProcess.html.twig', array('inProcessList' => $InProcessList));
             }
-
         }
     }
     
@@ -854,8 +852,6 @@ class MainController extends AbstractController{
         }
 
     }
-
-    
     /**
      * @Route("/record-favorite/", name="recordFavorite")
      */
@@ -870,12 +866,38 @@ class MainController extends AbstractController{
             $userMyself->addFavorite($user);
             $this->getDoctrine()->getManager()->flush();
             return $this->json(["success" => true]);
-
-
         }
 
+    }
+    /**
+     * @Route("/updateStreamer/", name="updateStreamer")
+     * 
+     * fonction pour l'ajax dans levelUp pour hydrater un user qui passe à streamer avec les données venant de l'API twitch
+     */
+    public function updateStreamer(Request $request){
+        $session=$this->get('session');
+        if(!$session->has('account') || $session->get('account')->getType()!=2){
+            dump($session->get('account')->getType());
+            throw new NotFoundHttpException('non autorisé'); 
+        }else{
+            if($request->isMethod('post')){
+                $name = $request->request->get('name');
+                $twitchId = $request->request->get('twitchId');
+                $link = $request->request->get('link');
+                $ur=$this->getDoctrine()->getRepository(User::class);
+                $user = $ur->findOneByName($name);
+                dump($user);
+                dump($link);
+                dump($twitchId);
+                $user->setTwitchId($twitchId)->setProfilImage($link);
+                $um = $this->getDoctrine()->getManager()->flush();
+                return $this->json(["success" => true]);
 
-
+                
+            }else{
+                return $this->json(['error' =>true]);
+            }
+        }
     }
 
 }
