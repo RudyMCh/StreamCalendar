@@ -25,6 +25,12 @@
                         <li class="nav-item {% if  way =='home' %} active bg-success rounded{% endif %}">
                             <a class="nav-link " href="{{ path('home')}}">Accueil</a>
                         </li>
+                        <li class="nav-item {% if  way =='login' %} active bg-success rounded{% endif %}">
+                            <a class="nav-link " href="{{ path('login')}}">Connexion</a>
+                        </li>
+                        <li class="nav-item {% if  way =='register' %} active bg-success rounded{% endif %}">
+                            <a class="nav-link " href="{{ path('register')}}">Inscription</a>
+                        </li>
                     <!-- session viewer viewerCalendar -->
                     {% if app.session.has('account') %}
                         <li class="nav-item {% if  way =='viewerCalendar' %} active bg-success rounded{% endif %}">
@@ -32,6 +38,9 @@
                         </li>
                         <li class="nav-item {% if  way =='viewerProfile' %} active bg-success rounded{% endif %}">
                             <a class="nav-link " href="{{ path('viewerProfile')}}">Mon Profil viewer</a>
+                        </li>
+                        <li class="nav-item {% if  way =='logout' %} active bg-success rounded{% endif %}">
+                            <a class="nav-link " href="{{ path('logout')}}">Déconnexion</a>
                         </li>
                     {% endif %}
 

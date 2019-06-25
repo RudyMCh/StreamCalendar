@@ -147,7 +147,7 @@
 
     // creatuser(data);
 
-     getUserById('44322789');
-     getUserByLogin('Walt71Fr');
+    //  getUserById('44322789');
+    //  getUserByLogin('Walt71Fr');
     // getGameTop100();
 
