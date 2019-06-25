@@ -1,20 +1,22 @@
 {% extends "base.html.twig" %}
-{% block title %}Administration{% endblock %}
+{% block title %}Administration Update Streamer{% endblock %}
 {% block body %}
-    <h1 class="text-center">Administration</h1>
 
-    <div class="container">
+    <h1 class="text-center">Administration Update Streamer</h1>
+
+    <div class="container"
         <div class="row">
-            <h5 class="text-center"></h5><br>
-            <p id="infoGames"></p>
-        </div>
-    </div>
+            <h5 class="text-center">Récupération  Api Twitch de 100 Users (diffusion): https://api.twitch.tv/helix/users?first=100</h5><br>
 
+
+        </div>
+    </div> 
 {% endblock %}
 {% block javascripts %}
 
-<script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
+<script>
 // Fonction qui échappe les métacaractères HTML (équivalent de htmlspecialchars PHP)
         function escapeHtml(text) {
             text = text.toString();
@@ -27,19 +29,14 @@
             };
 
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-            }
+        }
 
-            // Function to create a #view to display Ajax inqiry response.
-        function initView(){
-            //$('#view').remove();
-            $('body').append('<div id="infoGames"></div>');
-            }   
             // On fait une requête AJAX sur le site API Twitch Game pour récupérer les 100 premiers Games actuels en diffusion
             
             $.ajax({
 
                 type: 'GET',
-                url: 'https://api.twitch.tv/helix/games/top?first=100',
+                url: 'https://api.twitch.tv/helix/users?first=100',
                 dataType: 'json',
                 timeout: 30000,
                 headers: {
@@ -47,29 +44,14 @@
                 },
                 
                 success: function(data){
-                
-                initView();
-                let i=1;
-                    data.data.forEach(function(games){
-                        
-                        $('#infoGames').append(`
-                        <p class="left">user by ID ` + i + `</p>
-                        <p class="left">Games id : ` + games.id + `</p>
-                        <p class="left">Games name : ` + games.name + `</p>
-                        <p class="left">Lien de l'image Games : ` + games.box_art_url + `</p>`);
-                        i++;
-                    });  
                 console.log(data)
-                };
-
-                //var_dump(json_decode(data));
+                },
                 
                 error: function(){
                     // La requête AJAX a échoué, donc message d'erreur
                     displayMsg('Erreur lors de la récupération des données');
                 }
             });
-
 
 </script>
 {% endblock %}

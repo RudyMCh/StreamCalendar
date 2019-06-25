@@ -15,7 +15,7 @@ var modalNewEvent = `
     <div class="modal-content">
         <span id="close1" class="close">&times;</span>
         <form id="event" action="{{ path('insert') }}" method="POST" class="form-group col-12" >
-            <input type="text" name="title" placeholder="titre" class="form-control">
+            <input type="text" id="bloodhound" name="title" placeholder="titre" class="form-control typeahead">
             <input type="text" name="description" placeholder="description" class="form-control">
             <input type="text" name="start" class="form-control" style="display:none">
             <input type="text" name="end" class="form-control" style="display:none">
@@ -68,25 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
-        eventRender: function(info) {
-            var tooltip = new Tooltip(info.el, {
-                title: info.event.extendedProps.description,
-                placement: 'top',
-                trigger: 'hover',
-                container: 'body'
-            });
-        },
-        eventMouseEnter: function(mouseEnterInfo){
-            console.log(mouseEnterInfo);
-            $(mouseEnterInfo.el).css('background-color', 'black');
+        // 3,
+        // eventMouseEnter: function(mouseEnterInfo){
+        //     console.log(mouseEnterInfo);
+        //     $(mouseEnterInfo.el).css('background-color', 'black');
             
-        },
-        eventMouseLeave: function(mousEventLeave){
-            $(mousEventLeave.el).css('background-color', 'blue');
-        },
+        // },
+        // eventMouseLeave: function(mousEventLeave){
+        //     $(mousEventLeave.el).css('background-color', 'blue');
+        // },
         events:{
-            url : targetExtract,
-            color: 'blue'
+            url : targetExtract
         },
         timeZone: 'UTC',
         themeSystem: 'bootstrap',
@@ -142,6 +134,23 @@ document.addEventListener('DOMContentLoaded', () => {
             //add a listener on the div modalPlace et on cree un formulaire modal
             var $modal = $('#modalPlace');
             $modal.append(modalNewEvent);
+            var activity = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.whitespace,
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                
+                local: activities
+                });
+        
+                $('#bloodhound.typeahead').typeahead({
+                    hint: true,
+                    highlight: true,
+                    minLength: 1
+                },
+                {
+                    name: 'activity',
+                    source: activity
+                });
+        
             $('#close1').click(function(){
                 $('#myModal1').remove();
             });
@@ -175,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 calendar.refetchEvents();
                             }else{
                                 console.log(data.errors)
-                                setError($(".info"), "erreur bdd");
+                                $('#bloodhound').append('<p class="danger">ce jeux ne fait pas parti de vos favoris</p>')
                             }
                         },
                         error: function(data){

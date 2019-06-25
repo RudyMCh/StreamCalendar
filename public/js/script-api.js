@@ -41,13 +41,13 @@
                     removeOverlay();
                 },
                 success: function(data){
-                    console.log(data);
+                    //console.log(data);
                     // call function to prepare location where to display request response
                     initView();
 
                     let i=1;
                     data.data.forEach(function(user){
-                        console.log(user);
+                        //console.log(user);
                         $('#view').append(`
                         <p class="left">user by ID ` + i + ` ---------------------------------------------------- </p>
                         <p class="left">User id : ` + user.id + `</p>
@@ -74,20 +74,20 @@
                 dataType: 'json',
                 timeout: 30000,
                 headers: {
-                    'Client-ID': ClientID
+                    'Client-ID': '04zu3b1v2s1h7dpk5m4om1q6mgck5s'
                 },
                 complete: function(){
                     // once request is over, we remove the overlay
                     removeOverlay();
                 },
                 success: function(data){
-                    console.log(data);
+                    //console.log(data);
                     // call function to prepare location where to display request response
                     initView();
 
                     let i=1;
                     data.data.forEach(function(user){
-                        console.log(user);
+                        //console.log(user);
                         $('#view').append(`
                         <p class="left">user by Login ` + i + ` ---------------------------------------------------- </p>
                         <p class="left">User id : ` + user.id + `</p>
@@ -121,14 +121,14 @@
                     removeOverlay();
                 },
                 success: function(data){
-                    console.log(data);
+                   // console.log(data);
                     // call function to prepare location where to display request response
                     initView();
 
                     let i=1;
 
                     data.data.forEach(function(game){
-                        console.log(game);
+                        //console.log(game);
                         $('#view').append(`
                         <p class="left">game ` + i + ` ---------------------------------------------------- </p>
                         <p class="left">` + game.id + `</p>

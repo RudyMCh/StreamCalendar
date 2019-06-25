@@ -37,30 +37,28 @@
 
         <div class="info col-md-4" style="min-height:100px;">
             <h5 class="text-center">Vous pouvez modifier vos infos ici:</h5>
-            <div class="col-md-8">
-                <form class="form-group col-12  ml-1" action="{{ path('viewerProfile') }}" method="POST">
-                    <fieldset>
-                        <label for="name">Nom</label>
-                        <input class="form-control" type="text" name="name" value={{app.session.get('account').name}} placeholder="Entrez votre Nom">
-                        {% if errors.name is defined %}
-                        <p style="color:red">nom incorrect</p>
-                        {% endif %}
-                        <label for="email">email</label>
-                        <input class="form-control" type="text" name="email" value={{app.session.get('account').email}} placeholder="Entrez votre Email">
-                        {% if errors.email is defined %}
-                        <p style="color:red";>email invalide</p>
-                        {% endif %}
-                        {% if errors.alreadyUsed is defined %}
-                        <p style="color:red";>email non modifié car déjà utilisé</p>
-                        {% endif %}
-                        <input class="btn btn-primary mt-3" type="submit" value="Valider">
-                    </fieldset>
-                </form>
-            </div>
+            <form class="form-group col-12 col-md-6 ml-1" action="{{ path('viewerProfile') }}" method="POST">
+                <fieldset>
+                    <label for="name">Nom</label>
+                    <input class="form-control" type="text" name="name" value={{app.session.get('account').name}} placeholder="Entrez votre Nom">
+                    {% if errors.name is defined %}
+                    <p style="color:red">nom incorrect</p>
+                    {% endif %}
+                    <label for="email">email</label>
+                    <input class="form-control" type="text" name="email" value={{app.session.get('account').email}} placeholder="Entrez votre Email">
+                    {% if errors.email is defined %}
+                    <p style="color:red";>email invalide</p>
+                    {% endif %}
+                    {% if errors.alreadyUsed is defined %}
+                    <p style="color:red";>email non modifié car déjà utilisé</p>
+                    {% endif %}
+                    <input class="btn btn-primary mt-3" type="submit" value="Valider">
+                </fieldset>
+            </form>
         </div>
         
-        
-            <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
                 <p>vous pouvez gérer vos streamers favoris <a href="{{ path('viewerFavStream') }}">içi</a></p>
             </div>
         </div>

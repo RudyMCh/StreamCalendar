@@ -1,0 +1,34 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<h1>passage à streamer</h1>
+
+{% if inProcessList is defined %}
+{% for inProcess in inProcessList %}
+<p>------------------------------------</p>
+    <ul>
+        <li>{{ inProcess.name }}</li>
+        <li>{{ inProcess.email }}</li>
+        <li>{{ inProcess.type }}</li>
+        <li>{{ inProcess.tokenInProcess }}</li>
+        <p>page twitch de {{ inProcess.name }} <a href="https://twitch.tv/{{inProcess.name }}">ici</a></p>
+        <a id="twitch" href="{{ path('levelUp', { "id" : inProcess.id, "tokenInProcess" : inProcess.tokenInProcess, "result": "accepted"}) }}">cliquez ici pour authoriser le passage à streamer</a><br>
+        <a href="{{ path('levelUp', { "id" : inProcess.id, "tokenInProcess" : inProcess.tokenInProcess, "result":"refused"}) }}">cliquez ici pour refuser le passage à streamer</a>
+    </ul>
+
+{% endfor %}
+
+    {% else %}
+        <p class="text-center">il n'y a aucune demande d'élévation de statut actuellement</p>
+{% endif %}
+
+    
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('js/scriptLevelup.js') }}"></script>
+<script> 
+    var targetUpdateStreamer = '{{ url('updateStreamer') }}'
+    
+    </script>
+{% endblock %}
