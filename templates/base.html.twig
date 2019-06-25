@@ -25,7 +25,6 @@
                         <li class="nav-item {% if  way =='home' %} active bg-success rounded{% endif %}">
                             <a class="nav-link " href="{{ path('home')}}">Accueil</a>
                         </li>
-
                     <!-- session viewer viewerCalendar -->
                     {% if app.session.has('account') %}
                         <li class="nav-item {% if  way =='viewerCalendar' %} active bg-success rounded{% endif %}">
@@ -56,67 +55,18 @@
                         <li class="nav-item {% if  way =='isInProcess' %} active bg-success rounded{% endif %}">
                             <a class="nav-link " href="{{ path('isInProcess')}}">passage Streamer</a>
                         </li>
-                    {% endif %}
-                    <!-- logout -->
-                    {% if app.session.has('account') %}
-                        <li class="nav-item {% if  way =='logout' %} active bg-success rounded{% endif %}">
-                            <a class="nav-link " href="{{ path('logout')}}">deconnexion</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item {% if  way =='login' %} active bg-success rounded{% endif %}">
-                            <a class="nav-link " href="{{ path('login')}}">connexion</a>
-                        </li>
-                        <li class="nav-item {% if  way =='register' %} active bg-success rounded{% endif %}">
-                            <a class="nav-link " href="{{ path('register')}}">inscription</a>
+                        <li class="nav-item {% if  way =='upadteGames' %} active bg-success rounded{% endif %}">
+                            <a class="nav-link" href="{{ path('updateGames')}}">Update Games</a>
                         </li>
                     {% endif %}
                     </ul>
                 </div>
             </nav>
-            <div class="pageperso">
-
-<<<<<<< HEAD
-                {# menu calendrier streamer uniquement si streamer #}
-                <!-- session streamer myCalendar -->
-                {% if app.session.has('account') and app.session.get('account').type >= 1 %}
-                    <li class="nav-item {% if  way =='myCalendar' %} active bg-success rounded{% endif %}">
-                        <a class="nav-link " href="{{ path('myCalendar')}}">Mon Calendrier streamer</a>
-                    </li>
-                {% endif %}
+            {% block body %}
                 
-                <!-- logout -->
-                {% if app.session.has('account') %}
-                    <li class="nav-item {% if  way =='logout' %} active bg-success rounded{% endif %}">
-                        <a class="nav-link " href="{{ path('logout')}}">deconnexion</a>
-                    </li>
-                {% else %}
-                    <li class="nav-item {% if  way =='login' %} active bg-success rounded{% endif %}">
-                        <a class="nav-link " href="{{ path('login')}}">connexion</a>
-                    </li>
-                    <li class="nav-item {% if  way =='register' %} active bg-success rounded{% endif %}">
-                        <a class="nav-link " href="{{ path('register')}}">inscription</a>
-                    </li>
-                {% endif %}
+            {% endblock %}
 
-                <!-- session Administration adminBackend -->
-                {% if app.session.has('account') and app.session.get('account').type == 2 %}
-                    <li class="nav-item {% if  way =='adminBackend' %} active bg-success rounded{% endif %}">
-                        <a class="nav-link" href="{{ path('adminBackend')}}">Administration</a>
                     
-                        <div class="nav justify-content-end">
-                            <li class="nav-item {% if  way =='upadteGames' %} active bg-success rounded{% endif %}">
-                                <a class="nav-link" href="{{ path('updateGames')}}">Update Games</a>
-                            </li>
-                        </div>
-                    </li> 
-                {% endif %}
-                </ul>
-=======
-                    {% block body %}{% endblock %}
-                    
->>>>>>> origin/master
-            </div>
-
             <footer class="bg-primary text-right p-1">
                 <p>fièrement propulsé par nous-même</p>
                 

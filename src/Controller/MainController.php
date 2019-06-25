@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\User;
-use App\Entity\Activity;
 use App\Entity\Event;
 use App\Entity\Activity;
 use \DateTime;
