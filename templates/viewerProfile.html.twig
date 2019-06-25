@@ -14,15 +14,25 @@
     <div class="row">
         
         <div id="view" class="col-md-4" style="min-height:100px;">
-            <p class="text-center">Twitch ID: {% if app.session.get('account').twitchId %} défini {% else %} pas défini {% endif %}</p>
-            <p class="text-center">Image de profil:{% if app.session.get('account').profilImage %} <img style="width:50px;" src="{{asset(app.session.get('account').profilImage)}}" alt="image de profil"> {% else %} <img style="width:50px;" src="{{asset('img/inconnu.svg')}}" alt="image de profil"> {% endif %}</p>
-        {% if app.session.get('account').inProcess == 1 %}
-            <p>Votre demande pour devenir streamer est en cours de traitement</p>
-        {% elseif app.session.get('account').type == 2 %}
-            <p>Désolé, votre demande pour évoluer vers un profil streamer a été rejetée</p>
-        {% elseif app.session.get('account').type == 0 %}
-            <p>Vous pouvez faire évoluer votre compte vers un profil streamer en cliquant <a href="{{ path('viewer2streamer') }}">içi</a></p>
-        {% endif %}
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6 twitchId">
+                        <p class="text-center">Twitch ID: {% if app.session.get('account').twitchId %} défini {% else %} pas défini {% endif %}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="text-center">Image de profil:{% if app.session.get('account').profilImage %} <img style="width:50px;" src="{{asset(app.session.get('account').profilImage)}}" alt="image de profil"> {% else %} <img style="width:50px;" src="{{asset('img/inconnu.svg')}}" alt="image de profil"> {% endif %}</p>
+                    </div>
+                    <div class="col-md-12">
+                        {% if app.session.get('account').inProcess == 1 %}
+                            <p>Votre demande pour devenir streamer est en cours de traitement</p>
+                        {% elseif app.session.get('account').type == 2 %}
+                            <p>Désolé, votre demande pour évoluer vers un profil streamer a été rejetée</p>
+                        {% elseif app.session.get('account').type == 0 %}
+                            <p>Vous pouvez faire évoluer votre compte vers un profil streamer en cliquant <a href="{{ path('viewer2streamer') }}">içi</a></p>
+                        {% endif %}
+                    </div>
+                </div>    
+            </div>
         </div>
 
         <div class="info col-md-4" style="min-height:100px;">
@@ -30,12 +40,12 @@
             <form class="form-group col-12 col-md-6 ml-1" action="{{ path('viewerProfile') }}" method="POST">
                 <fieldset>
                     <label for="name">Nom</label>
-                    <input class="form-control" type="text" name="name" value={{app.session.get('account').name}} placeholder="Entrez votre Nom">
+                    <input class="form-control" type="text" name="name" value="{{app.session.get('account').name}}" placeholder="Entrez votre Nom">
                     {% if errors.name is defined %}
                     <p style="color:red">nom incorrect</p>
                     {% endif %}
                     <label for="email">email</label>
-                    <input class="form-control" type="text" name="email" value={{app.session.get('account').email}} placeholder="Entrez votre Email">
+                    <input class="form-control" type="text" name="email" value="{{app.session.get('account').email}}" placeholder="Entrez votre Email">
                     {% if errors.email is defined %}
                     <p style="color:red";>email invalide</p>
                     {% endif %}
@@ -63,8 +73,5 @@
   
     <script src="{{asset('js/script-api.js')}}" type="text/javascript"></script>
     
-    <script>
-        var targetExtract = "{{ url('extract') }}";       
-    </script>
 
 {% endblock %}

@@ -25,7 +25,8 @@ class MainController extends AbstractController{
     public function home(){
 
         $title = $this->getParameter('site_title');
-
+        $token = md5(rand());
+        dump($token);
         return $this->render('index.html.twig', array('title' => $title));
     }
 
@@ -54,9 +55,6 @@ class MainController extends AbstractController{
                     $activityList[]=$activity->getName();
                 }
                 dump($activityList);
-
-
-
                 return $this->render('myCalendar.html.twig', array("activities" => $activityList));
             }
         }
@@ -352,7 +350,9 @@ class MainController extends AbstractController{
             $start = $request->request->get('start');
             $end = $request->request->get('end');
             $description = $request->request->get('description');
-            if(!preg_match('#^.{1,50}$#i',$title)){
+            $ar= $this->getDoctrine()->getRepository(Activity::class);
+            $activity=$ar->findOneByName($title);
+            if(empty($activity)){
                 $errors['title']= true;
             }
             if(!preg_match('#^.{0,1000}$#i', $description)){
@@ -490,6 +490,8 @@ class MainController extends AbstractController{
     return $this->render('viewerCalendar.html.twig', array("favStream" => $favStream));
     }
 
+   
+    
     /**
      * @Route("/mon-profil-viewer/", name="viewerProfile")
      */
@@ -608,7 +610,7 @@ class MainController extends AbstractController{
         return $this->redirectToRoute('viewerProfile');
 
     }
-
+    
     /**
      * @Route("/mon-profil-streamer/", name="streamerProfil")
      */
@@ -660,99 +662,231 @@ class MainController extends AbstractController{
      */
     public function adminBackend(Request $request, Swift_Mailer $mailer){
 
-        //     //vérification si déjà connecté
-        //     $session = $this->get('session');
+        //vérification si déjà connecté
+            $session = $this->get('session');
     
-        //     if(!$session->has('account')){
-        //         return $this->redirectToRoute('login');
+            if(!$session->has('account')){
+                return $this->redirectToRoute('login');
+            }
+
+            if($session->has('account')){
+                $type = $session->get('account')->getType();
+                if($type!=2){
+                    throw new NotFoundHttpException('accès non autorisé');
+                }else{
+                    return $this->render('adminBackend.html.twig');
+                }
+            }
     
-        //     }
-        //     if($session->has('account')){
-        //         $type = $session->get('account')->getType();
-        //         if($type!=2){
-        //             throw new NotFoundHttpException('accès non autorisé');
-        //         }else{
-        //             return $this->render('adminBackend.html.twig');
-        //         }
-        //     }
+            return $this->render('adminBackend.html.twig');
+        }
     
-        //    // return $this->render('adminBackend.html.twig');
-        // //}
-    
-        // // /**
-        // //  * @Route("/admin-maj-game", name="updateGames")
-        // //  */
-        // // public function updateGames(Request $request)
-        // //{
-        //     //vérification si déjà connecté
-        //     //$session= $this->get('session');
-        //     //$user =$session->get('account');
-            
-        //     // Récupération données JSON
-        //     $gameRepo = $this->getDoctrine()->getRepository(Activity::class);
-        //     $games = $gameRepository->findById($twitch_code);
-        //     if(empty($games)){
-        //         return $this->json(['empty' =>true]);
-        //     }else{ 
-        //         foreach($games as $game){
-        //             $gamesArray[] = [
-        //                 'data.data.id' => $game->getId(),
-        //                 'data.data.name' => $game->getName(),
-        //                 'data.data.box_art_url' => $game->getGame_image()
-        //             ];
-        //         }
-        //         var_dump(json_decode($gamesArray));
-        //         return $this->json($gamesArray);
-        //         dump(json_decode($game));
-        //     }
-        //     // appel des variables
-        //     if($request->isMethod('post')){
-            
-        //         // Récupération données post
-        //         $twitch_code = $request->request->get('id');
-        //         $name = $request->request->get('name');
-        //         $game_image = $request->request->get('box_art_url');
-                
-        //         if(!preg_match('#^[0-9]{1,20}$#i',$twitch_code)){
-        //             $errors['id']= true;
-        //         }
-        //         if(!preg_match('#^.{2,255}$#i',$name)){
-        //             $errors['name']= true;
-        //         }
-        //         if(!preg_match('#^.{2,350}$#i',$game_image)){
-        //             $errors['box_art_url']= true;
-        //         }
-                
-        //         // Si pas d'erreurs
-        //         if(!isset($errors)){
-    
-        //         // Verif si existe pas
-        //         $gameRepo = $this->getDoctrine()->getRepository(Activity::class);
-    
-        //         $gamesIfExist = $gameRepo->findById($twitch_code);
-    
-        //         if(empty($gamesIfExist)){
-    
-        //             // Création d'un nouveau jeu
-        //             $newGames = new Activity();
-        //             // on hydrate $newGames
-        //             $newGames
-        //                 ->setId($twitch_code)
-        //                 ->setName($name)
-        //                 ->setBox_art_url($game_image)
-        //             ;
-        //             // Récupération du manager des entités
-        //             $em = $this->getDoctrine()->getManager();
-        //             $em->merge($newGames);
-        //             $em->flush();
-        //         }
-        //     }
-        //     return $this->json(["success" => true]);
-        // } else {
-        //     return $this->json(["success" => false]);
-        // } 
+    /**
+    * @Route("/admin-maj-game/", name="updateGames")
+    */
+    public function updateGames(Request $request){
+
+
+            //vérification si déjà connecté
+        $session= $this->get('session');
+        if(!$session->has('account')){
+            return $this->redirectToRoute('login');
+        }
+
+        if($session->has('account')){
+            $type = $session->get('account')->getType();
+            if($type!=2){
+                throw new NotFoundHttpException('accès non autorisé');
+            }
+            // appel des variables
+            if($request->isMethod('post')){
+                // Récupération données post
+                $twitch_code = $request->request->get('id');
+                $name = $request->request->get('name');
+                $game_image = $request->request->get('pic');
+                $gameRepo = $this->getDoctrine()->getRepository(Activity::class);        
+                $gamesIfExist = $gameRepo->findOneById($twitch_code);
+
+                if (!empty($gamesIfExist)){
+                    $errors['AlreadyExist']= true;
+                }
+
+                if(!preg_match('#^[0-9]{1,20}$#',$twitch_code)){
+                    $errors['twitchId']= true;
+                }
+                if(!preg_match('#^.{2,255}$#',$name)){
+                    $errors['game']= true;
+                }
+                if(!preg_match('#^.{2,350}$#',$game_image)){
+                    $errors['link']= true;
+                }
+                // Si pas d'erreurs
+                if(!isset($errors)){    
+                    // Création d'un nouveau jeu
+                    $newGames = new Activity();
+                // on hydrate $newGames
+                    $newGames
+                        ->setTwitchCode($twitch_code)
+                        ->setName($name)
+                        ->setGameImage($game_image)
+                    ;
+                // Récupération du manager des entités
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($newGames);
+                    $em->flush();
+                    return $this->render('updateGames.html.twig', ['success' => true]);
+                }
+            }
+            return $this->render('updateGames.html.twig',['errors' => false]); 
+        } 
+    return $this->render('updateGames.html.twig');
     }
-    
+    /**
+     * @Route("/demande-passage-a-streamer/", name="isInProcess")
+     * 
+     * page permettant d'afficher tous les user en demande de passage à streamer
+     * 
+     */
+    public function isInProcess(){
+        $session=$this->get('session');
+        if(!$session->has('account') || $session->get('account')->getType()!=2){
+
+            throw new NotFoundHttpException('non autorisé'); 
+        }else{
+            $ur = $this->getDoctrine()->getRepository(User::class);
+            $InProcessList = $ur->findByInProcess(1);
+            if(empty($InProcessList)){
+                return $this->render('isInProcess.html.twig');
+            }else{
+
+                return $this->render('isInProcess.html.twig', array('inProcessList' => $InProcessList));
+            }
+        }
+    }
+
+
+
+    ///**
+    //* @Route("/admin-maj-streamer", name="updateStreamer")
+    //*/
+    //public function updateStreamer(Request $request){
+    //      $session= $this->get('session');
+
+            //if(!$session->has('account')){
+                //return $this->redirectToRoute('login');
+            //}
+
+            //if($session->has('account')){
+                //$type = $session->get('account')->getType();
+            //if($type!=2){
+                //throw new NotFoundHttpException('accès non autorisé');
+            //}else{
+
+
+                //return $this->render('adminBackend.html.twig');
+        //}
+    //}
+    //}
+
+
+
+    /**
+     * @Route("/levelUp/{id}/{tokenInProcess}/{result}/", name="levelUp", requirements={"id"="[1-9][0-9]{0,10}", "tokenInProcess"=".{32}", "result"="(accepted|refused)"})
+     * 
+     * fonction pour valider ou non le passage à streamer d'un viewer
+     */
+
+    public function levelUp($id, $tokenInProcess, $result,  Swift_Mailer $mailer ){
+        $session=$this->get('session');
+        if(!$session->has('account') || $session->get('account')->getType()!=2){
+            dump($session->get('account')->getType());
+            throw new NotFoundHttpException('non autorisé'); 
+        }else{
+            if($result == "refused"){
+                $ur = $this->getDoctrine()->getRepository(User::class);
+                $user=$ur->findOneById($id);
+                if($tokenInProcess!= $user->getTokenInProcess()){
+                    throw new NotFoundHttpException('token invalide');
+                }
+                $user->setInProcess(2);
+                $um = $this->getDoctrine()->getManager()->flush();
+                $message= (new Swift_Message('mail de confirmation Streamer'))
+                            ->setFrom("nous@gmail.com")
+                            ->setTo($user->getEmail())
+                            ->setBody(
+                                $this->renderView('emails/refusedStreamer.html.twig', array(
+                                    "user" => $user,
+                                )),
+                                'text/html'
+                                )
+                            ->addPart(
+                                $this->renderView('emails/refusedStreamer.txt.twig', array(
+                                    "user" => $user,
+                                )),
+                                'text/plain'
+                            )
+                ;
+                $status = $mailer->send($message);
+                if($status){
+                    return $this->render('levelUp.html.twig', array(
+                        'successMail' => true,
+                        "user" => $user,
+                        'refused'=> true
+                ));
+                }else{
+                    $errors['errorMail'] = true;
+                    return $this->render('levelUp.html.twig', array(
+                        'errorsMail' => true,
+                        "user" => $user,
+                        'refused'=> true
+                    ));
+                }
+            }
+            if($result == "accepted"){
+                $ur = $this->getDoctrine()->getRepository(User::class);
+                $user=$ur->findOneById($id);
+                if($tokenInProcess!= $user->getTokenInProcess()){
+                    throw new NotFoundHttpException('token invalide');
+                }
+                $user->setInProcess(0);
+                $user->setType(1);
+                $um = $this->getDoctrine()->getManager()->flush();
+                $message= (new Swift_Message('mail de confirmation Streamer'))
+                            ->setFrom("nous@gmail.com")
+                            ->setTo($user->getEmail())
+                            ->setBody(
+                                $this->renderView('emails/confirmationStreamer.html.twig', array(
+                                    "user" => $user,
+                                )),
+                                'text/html'
+                                )
+                            ->addPart(
+                                $this->renderView('emails/confirmationStreamer.txt.twig', array(
+                                    "user" => $user,
+                                )),
+                                'text/plain'
+                            )
+                ;
+                $status = $mailer->send($message);
+                if($status){
+                    return $this->render('levelUp.html.twig', array(
+                        'successMail' => true,
+                        'user'=> $user,
+                        "accepted" => true
+                ));
+                }else{
+                    $errors['errorMail'] = true;
+                    return $this->render('levelUp.html.twig', array(
+                        'errorsMail' => true,
+                        'user'=> $user,
+                        "accepted" => true
+                    ));
+                }
+            }
+
+        }
+
+    }
     /**
      * @Route("/record-favorite/", name="recordFavorite")
      */
@@ -767,12 +901,38 @@ class MainController extends AbstractController{
             $userMyself->addFavorite($user);
             $this->getDoctrine()->getManager()->flush();
             return $this->json(["success" => true]);
-
-
         }
 
-
-
     }
+    /**
+     * @Route("/updateStreamer/", name="updateStreamer")
+     * 
+     * fonction pour l'ajax dans levelUp pour hydrater un user qui passe à streamer avec les données venant de l'API twitch
+     */
+    public function updateStreamer(Request $request){
+        $session=$this->get('session');
+        if(!$session->has('account') || $session->get('account')->getType()!=2){
+            dump($session->get('account')->getType());
+            throw new NotFoundHttpException('non autorisé'); 
+        }else{
+            if($request->isMethod('post')){
+                $name = $request->request->get('name');
+                $twitchId = $request->request->get('twitchId');
+                $link = $request->request->get('link');
+                $ur=$this->getDoctrine()->getRepository(User::class);
+                $user = $ur->findOneByName($name);
+                dump($user);
+                dump($link);
+                dump($twitchId);
+                $user->setTwitchId($twitchId)->setProfilImage($link);
+                $um = $this->getDoctrine()->getManager()->flush();
+                return $this->json(["success" => true]);
 
+                
+            }else{
+                return $this->json(['error' =>true]);
+            }
+        }
+    }
 }
+
