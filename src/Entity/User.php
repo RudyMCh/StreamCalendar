@@ -325,7 +325,7 @@ class User
         return $this->tokenInProcess;
     }
 
-    public function setTokenInProcess(?string $tokenInProcess): self
+    public function setTokenInProcess(string $tokenInProcess): self
     {
         $this->tokenInProcess = $tokenInProcess;
 

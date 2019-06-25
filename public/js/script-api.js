@@ -150,4 +150,3 @@
     //  getUserById('44322789');
     //  getUserByLogin('Walt71Fr');
     // getGameTop100();
-

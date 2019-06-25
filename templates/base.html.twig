@@ -5,12 +5,22 @@
         <title>{% block title %}StreamCalendar{% endblock %}</title>
         <link href='https://use.fontawesome.com/releases/v5.0.6/css/all.css' rel='stylesheet'>
         <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
+        <style>
+            @font-face{
+                font-family: 'Endgame','AUBREY1__';
+                src: url("{{ asset('fonts/Endgame.otf') }}");
+                src: url("{{ asset('fonts/AUBREY1__') }}");
+                font-weight: normal;
+                font-style: normal;
+            }
+        </style>
         <link rel="stylesheet" href="{{ asset('css/style.css') }}">
         
         {% block stylesheets %}{% endblock %}
 
     </head>
     <body>
+        <div class="page-wrap">
         
             {% set way = app.request.attributes.get('_route') %}
             <nav class="navbar navbar-expand-lg navbar-light bg-primary">
@@ -25,12 +35,14 @@
                         <li class="nav-item {% if  way =='home' %} active bg-success rounded{% endif %}">
                             <a class="nav-link " href="{{ path('home')}}">Accueil</a>
                         </li>
+                        {% if app.session.get('account') is null %}
                         <li class="nav-item {% if  way =='login' %} active bg-success rounded{% endif %}">
-                            <a class="nav-link " href="{{ path('login')}}">Connexion</a>
-                        </li>
-                        <li class="nav-item {% if  way =='register' %} active bg-success rounded{% endif %}">
-                            <a class="nav-link " href="{{ path('register')}}">Inscription</a>
-                        </li>
+                          <a class="nav-link " href="{{ path('login')}}">Connexion</a>
+                      </li>
+                      <li class="nav-item {% if  way =='register' %} active bg-success rounded{% endif %}">
+                          <a class="nav-link " href="{{ path('register')}}">Inscription</a>
+                      </li>
+                        {% endif %}
                     <!-- session viewer viewerCalendar -->
                     {% if app.session.has('account') %}
                         <li class="nav-item {% if  way =='viewerCalendar' %} active bg-success rounded{% endif %}">
@@ -44,16 +56,15 @@
                         </li>
                     {% endif %}
 
-
                     {# menu calendrier streamer uniquement si streamer #}
                     <!-- session streamer myCalendar -->
                     {% if app.session.has('account') and app.session.get('account').type >= 1 %}
                         <li class="nav-item {% if  way =='myCalendar' %} active bg-success rounded{% endif %}">
                             <a class="nav-link " href="{{ path('myCalendar')}}">Mon Calendrier streamer</a>
                         </li>
-                        <li class="nav-item {% if  way =='streamerProfil' %} active bg-success rounded{% endif %}">
-                            <a class="nav-link " href="{{ path('streamerProfil')}}">Mon profil Streamer</a>
-                        </li>
+                        <li class="nav-item {% if  way =='streamerProfile' %} active bg-success rounded{% endif %}">
+                          <a class="nav-link " href="{{ path('streamerProfil')}}">Mon Profil Streamer</a>
+                      </li>
                     {% endif %}
                     
                     <!-- session Administration adminBackend -->
@@ -76,11 +87,49 @@
             {% endblock %}
 
                     
-            <footer class="bg-primary text-right p-1">
+            </div>
+    </div>
+<!-- FOOTER -->
+<div class="site-footer">
+    <footer class="page-footer font-small special-color-dark pt-4">
+        <!-- Footer Elements -->
+        <div class="container">
+          <!-- Social buttons -->
+          <ul class="list-unstyled list-inline text-center">
+            <li class="list-inline-item">
+              <a class="btn-floating btn-fb mx-1">
+                <i class="fab fa-facebook-f fa-2x"> </i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <a class="btn-floating btn-tw mx-1">
+                <i class="fab fa-twitter fa-2x"> </i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <a class="btn-floating btn-gplus mx-1">
+                <i class="fab fa-google-plus-g fa-2x"> </i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <a class="btn-floating btn-li mx-1">
+                <i class="fab fa-linkedin-in fa-2x"> </i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <a class="btn-floating btn-dribbble mx-1">
+                <i class="fab fa-twitch fa-2x"> </i>
+              </a>
+            </li>
+          </ul>
+          <!-- Social buttons -->
+        </div>
+        <!-- Footer Elements -->
+      </footer>
+            <!-- <footer class="bg-primary text-right p-1">
                 <p>fièrement propulsé par nous-même</p>
-                
-            </footer>
-   
+        </footer> -->
+</div>
             <script src="{{ asset('js/jquery-3.4.1.min.js') }}"></script>
             <script src="{{ asset('js/bootstrap.min.js') }}"></script>
             <script src="https://unpkg.com/popper.js"></script>
