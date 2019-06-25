@@ -25,7 +25,7 @@
                     <div class="col-md-12">
                         {% if app.session.get('account').inProcess == 1 %}
                             <p>Votre demande pour devenir streamer est en cours de traitement</p>
-                        {% elseif app.session.get('account').type == 2 %}
+                        {% elseif app.session.get('account').inProcess == 2 %}
                             <p>Désolé, votre demande pour évoluer vers un profil streamer a été rejetée</p>
                         {% elseif app.session.get('account').type == 0 %}
                             <p>Vous pouvez faire évoluer votre compte vers un profil streamer en cliquant <a href="{{ path('viewer2streamer') }}">içi</a></p>
