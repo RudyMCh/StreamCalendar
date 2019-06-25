@@ -488,19 +488,19 @@ class MainController extends AbstractController{
     $favStream = $user->getFavorite();
 
     return $this->render('viewerCalendar.html.twig', array("favStream" => $favStream));
-    
     }
 
+   
+    
     /**
      * @Route("/mon-profil-viewer/", name="viewerProfile")
      */
     public function viewerProfile(Request $request){
         $session= $this->get('session');
         if(!$session->has('account')){
-            
             return $this->redirectToRoute('login');
         }
-                
+        dump($session);
         //listing out all variables
         if ($request->isMethod('post')) {
             $name = $request->request->get('name');
@@ -536,7 +536,6 @@ class MainController extends AbstractController{
         }
         return $this->render('viewerProfile.html.twig');
     }
-
 
     /**
      * @Route("/viewer-favoris-streamers/", name="viewerFavStream")

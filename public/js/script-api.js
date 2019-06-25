@@ -144,6 +144,9 @@
             });
         }
 
-    // getUserById('44322889');
-    // getUserByLogin('Walt71Fr');
+
+    // creatuser(data);
+
+    //  getUserById('44322789');
+    //  getUserByLogin('Walt71Fr');
     // getGameTop100();
