@@ -38,6 +38,11 @@ class Activity
      */
     private $users;
 
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $color;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -108,6 +113,18 @@ class Activity
             $this->users->removeElement($user);
             $user->removeActivity($this);
         }
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): self
+    {
+        $this->color = $color;
 
         return $this;
     }

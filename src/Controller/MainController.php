@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\User;
 use App\Entity\Event;
+use App\Entity\Activity;
 use \DateTime;
 use App\Service\Recaptcha;
 use App\Service\TokenGenerator;
@@ -441,50 +442,137 @@ class MainController extends AbstractController{
     public function viewerCalendar(){
         $session= $this->get('session');
         if(!$session->has('account')){
-            return $this->redirectToRoute('login');
-        }else{
-            $um = $this->getDoctrine()->getManager();
-            $user = $session->get('account');
-            //reattached the user to doctrine to get the favorites
-            $user=$um->merge($user);
-            $streamers = $user->getFavorite();            
-            return $this->render('viewerCalendar.html.twig', array("myStreamers" => $streamers));
+        return $this->redirectToRoute('login');
         }
-    }
-
+        // we fetch ourself !
+        $user = $session->get('account');
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->merge($user);
+        // we fetch and load the favorite streamers list for further sending to the view
+        $favStream = $user->getFavorite();
+    
+        return $this->render('viewerCalendar.html.twig', array("favStream" => $favStream));
+        }
+    
     /**
-     * @Route("/viewer-profile/", name="viewerProfile")
+     * @Route("/mon-profil-viewer/", name="viewerProfile")
      */
     public function viewerProfile(Request $request){
         $session= $this->get('session');
         if(!$session->has('account')){
             return $this->redirectToRoute('login');
-        }else{
-            $choice = $request->request->get('name');
-            
-            //appel des variables
-            if ($request->isMethod('post')) {
-                //bloc des vérifs
-                if(!preg_match('#^.{0,100}$#i', $choice)){
-                    $errors['choix'] = true;
-                    dump($choice);
-                } else {
-                    dump($choice);
-                }
-                
-            }
-
-            $er = $this->getDoctrine()->getRepository(User::class);
-            $streamers = $er->findByType(1); // seeking for streamer only
-
-            foreach ($streamers as $streamer){
-                $list[] = $streamer->getName();
-            }
-            //dump($list);
-            
-            return $this->render('viewerProfile.html.twig', array("streamerList" => $list));
         }
+        dump($session);
+        //listing out all variables
+        if ($request->isMethod('post')) {
+            $name = $request->request->get('name');
+            $email = $request->request->get('email');
+            //verifications
+            if(!preg_match('#^.{2,100}$#i', $name)){
+                $errors['name'] = true;
+            }
+            if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+                $errors['email'] = true;
+            }
+            //if no error
+            if(!isset($errors)){
+                $userVerif = $er->findOneByEmail($email); // we check ou whether or not the email is already existing
+                $em = $this->getDoctrine()->getManager();
+                $user = $this->get('session')->get('account');
+                $user = $em->merge($user);              // we fetch the connected user
+                if(empty($userVerif)){  // if the email wasn't existing so we can modify it
+                    $user->setEmail($email);
+                } else {
+                    $errors['alreadyUsed'] = true;
+                }
+                $user->setName($name);  // in any case we modify the name
+                // then we save values in the database and we update session variables
+                $em->flush();
+                $session->set('account', $user);
+            }
+            if(isset($errors)){
+                return $this->render('viewerProfile.html.twig', array('errors' => $errors));
+            } else {
+                return $this->render('viewerProfile.html.twig');
+            }
+        }
+        return $this->render('viewerProfile.html.twig');
     }
+
+    /**
+     * @Route("/viewer-favoris-streamers/", name="viewerFavStream")
+     * page for managing the favorites streamers
+     */
+    public function viewerFavStream(Request $request){
+        $session= $this->get('session');
+        if(!$session->has('account')){
+            return $this->redirectToRoute('login');
+        }
+        // we fetch all streamers from the database (type = 1)
+        $er = $this->getDoctrine()->getRepository(User::class);
+        $streamers = $er->findByType(1);
+
+        // we load the list for further sending to the view for typeahead feature
+        foreach ($streamers as $streamer){
+            $list[] = $streamer->getName();
+        }
+        //listing out all variables
+        if ($request->isMethod('post')) {
+            $name = $request->request->get('name');
+            //verifications
+            if(!preg_match('#^.{2,100}$#i', $name)){
+                $errors['name'] = true;
+            }
+            //if no error
+            if(!isset($errors)){
+                $str=$er->findOneByName($name);
+                // if favorite was found so we save it in the database
+                if (!empty($str)) {
+                    $user = $session->get('account');
+                    $em = $this->getDoctrine()->getManager();
+                    $user = $em->merge($user); // we make a merge because user is coming out from the session and is not fully understood 
+                    $user->addFavorite($str);
+                    $em->flush();
+                    dump($user);
+                    dump($str);
+                    return $this->render('viewerFavStream.html.twig', ['success'=>true, 'streamerList' => $list]);
+                } else {
+                    $errors['notexist']=true;
+                    return $this->render('viewerFavStream.html.twig', ['errors'=> $errors, 'streamerList' => $list]);
+                }
+            }
+            if(isset($errors)){
+                return $this->render('viewerFavStream.html.twig', array('errors' => $errors, 'streamerList' => $list));
+            } else {
+                return $this->render('viewerFavStream.html.twig', array("streamerList" => $list));
+            }
+        }
+        return $this->render('viewerFavStream.html.twig', array("streamerList" => $list));
+    }
+    
+    /**
+     * @Route("/evolution-profil/", name="viewer2streamer")
+     */
+    public function viewer2streamer(){
+        $session= $this->get('session');
+        if(!$session->has('account')){
+            return $this->redirectToRoute('login');
+        }
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->get('session')->get('account');
+        $user = $em->merge($user);              // we fetch the connected user
+        dump($user);
+        $user->setInProcess('1');
+        $user->setTokenInProcess(md5(rand()));
+        $em->flush();
+        $session->set('account', $user); // we update the session variable
+          
+
+
+        return $this->redirectToRoute('viewerProfile');
+
+    }
+    
     /**
      * @Route("mon-profil-streamer", name="streamerProfil")
      */

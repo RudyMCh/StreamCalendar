@@ -83,6 +83,11 @@ class User
      */
     private $activity;
 
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $tokenInProcess;
+
     public function __construct()
     {
         $this->events = new ArrayCollection();
@@ -311,6 +316,18 @@ class User
         if ($this->activity->contains($activity)) {
             $this->activity->removeElement($activity);
         }
+
+        return $this;
+    }
+
+    public function getTokenInProcess(): ?string
+    {
+        return $this->tokenInProcess;
+    }
+
+    public function setTokenInProcess(string $tokenInProcess): self
+    {
+        $this->tokenInProcess = $tokenInProcess;
 
         return $this;
     }

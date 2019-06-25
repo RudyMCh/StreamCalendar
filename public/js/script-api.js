@@ -144,6 +144,6 @@
             });
         }
 
-    getUserById('44322889');
-    getUserByLogin('Walt71Fr');
-    getGameTop100();
+    // getUserById('44322889');
+    // getUserByLogin('Walt71Fr');
+    // getGameTop100();
