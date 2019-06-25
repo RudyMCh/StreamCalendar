@@ -8,28 +8,31 @@
 {% endblock %}
 
 {% block body %}
+<div class="container">
+    <div class="row">
+        
+        <div class="liststreamer col-12 col-md-4 offset-3 favViewer" style="min-height:100px;">
 
-    <div class="liststreamer col-md-4" style="min-height:100px;">
+            {% if success is defined %}
+                <p style="color:green">Le streamer a bien été ajouté</p>
+            {% endif %}
 
-        {% if success is defined %}
-            <p style="color:green">Le streamer a bien été ajouté</p>
-        {% endif %}
-
-        <div id="bloodhound" class="col-8 mx-auto" style="min-height:100px">
-            <h5 class="text-center">Ajoutez un favoris :</h5>
-            <form class="form-group ml-1" action="{{ path('viewerFavStream') }}" method="POST">
-                <input class="form-control typeahead" name="name" type="text" placeholder="nom du Streamer">
-                {% if errors.name is defined %}
-                    <p style="color:red";>le format du nom n'est pas correct</p>
-                {% endif %}
-                {% if errors.notexist is defined %}
-                    <p style="color:red";>ce streamer n'existe pas</p>
-                {% endif %}
-                <input class="btn btn-primary mt-3" type="submit" value="Valider">
-            </form>
+            <div id="bloodhound" class="col-8 mx-auto" style="min-height:100px">
+                <h5 class="text-center">Ajoutez un favoris :</h5>
+                <form class="form-group ml-1" action="{{ path('viewerFavStream') }}" method="POST">
+                    <input class="form-control typeahead" name="name" type="text" placeholder="nom du Streamer">
+                    {% if errors.name is defined %}
+                        <p style="color:red";>le format du nom n'est pas correct</p>
+                    {% endif %}
+                    {% if errors.notexist is defined %}
+                        <p style="color:red";>ce streamer n'existe pas</p>
+                    {% endif %}
+                    <input class="btn btn-primary mt-3" type="submit" value="Valider">
+                </form>
+            </div>
         </div>
     </div>
-
+</div>
 {% endblock %}
 
 {% block javascripts %}

@@ -3,26 +3,34 @@
 {% block body %}
 <h1>Mon profil streamer</h1>
 
-
-<h2>{{ name }}</h2>
-<p>mon id twitch : {{ twhitchId }}</p>
-<h2>Mes activités</h2>
-<ul>
-{% for item in activity %}
-    <li>{{ item.name }}</li>
-{% endfor %}
-</ul>
-<img style="border-radius: 8px" src="{{ imgProfil }}" alt="avatar de {{ name }}">
-
-
-<form action="{{ path('streamerProfil') }}" method="POST" class="form-group">
-    <div >
-        <label for="activity">ajouter une activité</label>
-        <input id="bloodhound" class="typeahead form-control" type="text" placeholder="activité" name="activity">
+<div class="container-fluid">
+    <div class="row col-4 mx-auto streamBoxProfil">
+        <div class="col-md-12 text-center">
+            <h2>{{ name }}</h2>
+                <p>mon id twitch : {{ twhitchId }}</p>
+            <h2>Mes activités</h2>
+        </div>
+        <div class="col-md-12 text-center">
+            <ul>
+                {% for item in activity %}
+                    <li>{{ item.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-12 text-center">
+            <img style="border-radius: 8px" src="{{ imgProfil }}" alt="avatar de {{ name }}">
+        </div>
+        <div class="col-md-12 text-center">
+            <form action="{{ path('streamerProfil') }}" method="POST" class="form-group">
+                <div >
+                    <label for="activity">ajouter une activité</label>
+                    <input id="bloodhound" class="typeahead form-control" type="text" placeholder="activité" name="activity">
+                </div>
+                <input type="submit" clas="btn btn-primary">
+            </form>
+        </div>
     </div>
-    <input type="submit" clas="btn btn-primary">
-</form>
-    
+</div>  
 {% endblock %}
 
 
