@@ -134,17 +134,18 @@ h1{
     background-color:rgb(100, 65, 164);
     margin-top:5%;
     padding-bottom:5%;
-    margin-bottom:5%;
+    margin-bottom: 5%;
     border-radius:30px;
     box-shadow:  5px  5px  5px  5px grey;
+    min-height: 15em;
 }
-}
+
 .viewProfil{
     border:1px solid black;
     background-color:rgba(45, 79, 192, 0.7);
-    margin-top:5%;
     margin-left:2%;
     padding-bottom:5%;
+    padding-top:5%;
     margin-bottom:5%;
     border-radius:30px;
     box-shadow:  5px  5px  5px  5px grey;

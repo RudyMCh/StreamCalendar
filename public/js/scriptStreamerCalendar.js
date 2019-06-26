@@ -1,5 +1,5 @@
 function setError($input, msgText){
-    $input.after('<p class="error bg-warning" style="color:red;">' + msgText + '</p>');
+    $input.after('<p class="error bg-danger text-white text-center">' + msgText + '</p>');
 }
 var modalEvent = `
 <div id="myModal2" class="modal col-12">
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 data: {end: info.event._instance.range.end.toISOString(), publicId: info.event._def.publicId},
                 success: function(data){
                     if(data.success){
-                        console.log("ok");
+
                     }else{
                         console.log("pas ok");
                     }
@@ -169,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     setError($description, 'champ activité vide');
                 }
                 if($('.error').length == 0){
-                    console.log("demo Form : " + $form.serialize());
                     //si pas d'ereur, on fait la requête AJAX pour traiter le formulaire et joindre la base de données
                     $.ajax({
                         type: "POST",
@@ -179,12 +178,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         success: function(data){
                             if(data.success){
                                 $('.success').remove();
-                                $('.info').after('<p class="success bg-success" style="color:white">évènement créé avec succès</p>');
+                                $('.info').after('<p class="bg-success text-white text-center">évènement créé avec succès</p>');
                                 $('#myModal1').remove();
                                 calendar.refetchEvents();
                             }else{
-                                console.log(data.errors)
-                                $('#bloodhound').append('<p class="danger">ce jeux ne fait pas parti de vos favoris</p>')
+                                $('#bloodhound').append('<p class="bg-danger text-white rounded text-center">ce jeux ne fait pas parti de vos favoris</p>')
                             }
                         },
                         error: function(data){
@@ -208,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             $('#eventDelete').submit(function(e){
                 e.preventDefault();
-                console.log(info.event._def.publicId);
                 $.ajax({
                     type: 'POST',
                     url: deleteTarget,
@@ -216,13 +213,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     data:{publicId: info.event._def.publicId},
                     success: function(data){
                         if(data.success){
-                            console.log("suppression ok");
                             $('#myModal2').remove();
                             calendar.refetchEvents();
                         }
                     },
                     error: function(data){
-                        console.log('pas de suppression');
                         $('#myModal2').remove();
                         alert("suppression échouée")
 

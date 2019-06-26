@@ -25,8 +25,6 @@ class MainController extends AbstractController{
     public function home(){
 
         $title = $this->getParameter('site_title');
-        $token = md5(rand());
-        dump($token);
         return $this->render('index.html.twig', array('title' => $title));
     }
 
@@ -45,16 +43,13 @@ class MainController extends AbstractController{
                 throw new NotFoundHttpException('accès non autorisé');
             }else{
                 $user = $session->get('account');
-                dump($user);
                 $um = $this->getDoctrine()->getManager();
                 $user=$um->merge($user);
                 $activities = $user->getActivity();
-                dump($activities);
                 $activityList = [];
                 foreach($activities as $activity){
                     $activityList[]=$activity->getName();
                 }
-                dump($activityList);
                 return $this->render('myCalendar.html.twig', array("activities" => $activityList));
             }
         }
@@ -95,7 +90,6 @@ class MainController extends AbstractController{
                                 return $this->render('login.html.twig', ["errors" => $errors]);
                             }else{
                                 $session->set('account', $user);
-                                dump($session);
                                 return $this->render('login.html.twig', array('success'=>true));
                             }
                         }                        
@@ -144,7 +138,6 @@ class MainController extends AbstractController{
             $confirmPassword = $request->request->get('confirmPassword');
             //$reCaptcha = $request->request->get('g-recaptcha-response');
             
-
             //appel des variables
             if
             (
@@ -176,6 +169,7 @@ class MainController extends AbstractController{
                         //création d'un nouvel utilisateur
                         $user = new User();
                         $token= md5(rand());
+
                         //hydratation de $user
                         $user
                             ->setEmail($email)
@@ -192,29 +186,29 @@ class MainController extends AbstractController{
                         $em = $this->getDoctrine()->getManager();
                         $em->persist($user);
                         $em->flush();
-                        // $message= (new Swift_Message('mail de confirmation'))
-                        //     ->setFrom("nous@gmail.com")
-                        //     ->setTo($email)
-                        //     ->setBody(
-                        //         $this->renderView('emails/HelloWorld.html.twig', array(
-                        //             "user" => $user,
-                        //         )),
-                        //         'text/html'
-                        //         )
-                        //     ->addPart(
-                        //         $this->renderView('emails/HelloWorld.txt.twig', array(
-                        //             "user" => $user,
-                        //         )),
-                        //         'text/plain'
-                        //     )
-                        // ;
-                        // $status = $mailer->send($message);
-                        // if($status){
-                        //     return $this->render('register.html.twig', array('success' => true));
-                        // }else{
-                        //     $errors['errorMail'] = true;
-                        //     return $this->render('register.html.twig', array('errors' => $errors));
-                        // }
+                        $message= (new Swift_Message('mail de confirmation'))
+                            ->setFrom("nous@gmail.com")
+                            ->setTo($email)
+                            ->setBody(
+                                $this->renderView('emails/confirmationInscription.html.twig', array(
+                                    "user" => $user,
+                                )),
+                                'text/html'
+                                )
+                            ->addPart(
+                                $this->renderView('emails/confirmationInscription.txt.twig', array(
+                                    "user" => $user,
+                                )),
+                                'text/plain'
+                            )
+                        ;
+                        $status = $mailer->send($message);
+                        if($status){
+                            return $this->render('register.html.twig', array('success' => true));
+                        }else{
+                            $errors['errorMail'] = true;
+                            return $this->render('register.html.twig', array('errors' => $errors));
+                        }
                     } else {
                         $errors['alreadyUsed'] = true;
                     }
@@ -227,6 +221,33 @@ class MainController extends AbstractController{
             }
         }
     }
+
+    /**
+     * @Route("/activation/{id}/{token}/", name="activation", requirements={"id"="[1-9][0-9]{0,9}", "token"=".{32}"})
+     */
+    public function activation($id, $token){
+        $ur = $this->getDoctrine()->getRepository(User::class);
+        $user=$ur->findOneById($id);
+        if($user){
+            if($user->getToken() == $token){
+
+                if(!$user->getActive()){
+
+                    $user->setActive(true);
+                    $em  =$this->getDoctrine()->getManager();
+                    $em->flush();
+                    return $this->render('activation.html.twig');
+                }else{
+                    throw new NotFoundHttpException('compte déjà activé');
+                }
+            }else{
+                throw new NotFoundHttpException('token pas bon');
+            }
+        }else{
+            throw new NotFoundHttpException('compte pas bon');
+        }
+    }
+    
 
     /**
      * @Route("/extraction", name="extract")
@@ -476,18 +497,18 @@ class MainController extends AbstractController{
      * @Route("/mon-calendrier-viewer/", name="viewerCalendar")
      */
     public function viewerCalendar(){
-    $session= $this->get('session');
-    if(!$session->has('account')){
-    return $this->redirectToRoute('login');
-    }
-    // we fetch ourself !
-    $user = $session->get('account');
-    $em = $this->getDoctrine()->getManager();
-    $user = $em->merge($user);
-    // we fetch and load the favorite streamers list for further sending to the view
-    $favStream = $user->getFavorite();
+        $session= $this->get('session');
+        if(!$session->has('account')){
+        return $this->redirectToRoute('login');
+        }
+        // we fetch ourself !
+        $user = $session->get('account');
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->merge($user);
+        // we fetch and load the favorite streamers list for further sending to the view
+        $favStream = $user->getFavorite();
 
-    return $this->render('viewerCalendar.html.twig', array("favStream" => $favStream));
+        return $this->render('viewerCalendar.html.twig', array("favStream" => $favStream));
     }
 
    
@@ -547,9 +568,23 @@ class MainController extends AbstractController{
             return $this->redirectToRoute('login');
         }
         // we fetch all streamers from the database (type = 1)
+        $user = $session->get('account');
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->merge($user); // we make a merge because user is coming out from the session and is not fully understood 
         $er = $this->getDoctrine()->getRepository(User::class);
         $streamers = $er->findByType(1);
-
+        $listStreamer = $user->getFavorite();
+        if($request->isMethod('GET')){
+            $checkList = $request->query->get("notFollowed");
+            dump($checkList);
+            if(!empty($checkList)){
+                foreach($checkList as $check){
+                    $streamerToDelete = $er->findOneByName($check);
+                    $user->removeFavorite($streamerToDelete);
+                    $em->flush();
+                }
+            }
+        }
         // we load the list for further sending to the view for typeahead feature
         foreach ($streamers as $streamer){
             $list[] = $streamer->getName();
@@ -566,26 +601,25 @@ class MainController extends AbstractController{
                 $str=$er->findOneByName($name);
                 // if favorite was found so we save it in the database
                 if (!empty($str)) {
-                    $user = $session->get('account');
-                    $em = $this->getDoctrine()->getManager();
-                    $user = $em->merge($user); // we make a merge because user is coming out from the session and is not fully understood 
+                    
+                    
                     $user->addFavorite($str);
                     $em->flush();
                     dump($user);
                     dump($str);
-                    return $this->render('viewerFavStream.html.twig', ['success'=>true, 'streamerList' => $list]);
+                    return $this->render('viewerFavStream.html.twig', ['success'=>true, 'streamerList' => $list, "myFavStreamer" => $listStreamer]);
                 } else {
                     $errors['notexist']=true;
-                    return $this->render('viewerFavStream.html.twig', ['errors'=> $errors, 'streamerList' => $list]);
+                    return $this->render('viewerFavStream.html.twig', ['errors'=> $errors, 'streamerList' => $list, "myFavStreamer" => $listStreamer]);
                 }
             }
             if(isset($errors)){
-                return $this->render('viewerFavStream.html.twig', array('errors' => $errors, 'streamerList' => $list));
+                return $this->render('viewerFavStream.html.twig', array('errors' => $errors, 'streamerList' => $list, "myFavStreamer" => $listStreamer));
             } else {
-                return $this->render('viewerFavStream.html.twig', array("streamerList" => $list));
+                return $this->render('viewerFavStream.html.twig', array("streamerList" => $list, "myFavStreamer" => $listStreamer));
             }
         }
-        return $this->render('viewerFavStream.html.twig', array("streamerList" => $list));
+        return $this->render('viewerFavStream.html.twig', array("streamerList" => $list, "myFavStreamer" => $listStreamer));
     }
     
     /**
@@ -632,6 +666,7 @@ class MainController extends AbstractController{
                 $activityList[]=$activity->getName();
             }
             dump($activityList);
+            dump($user->getProfilImage());
             if($request->isMethod('POST')){
                 //enregistrement de l'activité choisie dans la page profil
                 $activityChosen = $request->request->get('activity');
@@ -649,7 +684,7 @@ class MainController extends AbstractController{
             "activity" => $user->getActivity(),
             "name" => $user->getName(),
             "twhitchId" => $user->getTwitchId(),
-            "imgProfil" => str_replace("{width}x{height}", "100x100",$user->getProfilImage()),
+            "imgProfil" => str_replace("300x300", "150x150",$user->getProfilImage()),
             "activityList" => $activityList
         ));
     

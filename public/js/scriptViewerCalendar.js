@@ -84,25 +84,14 @@ $(function(){
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         eventRender: function(info) {
-            // var tooltip = new Tooltip(info.el, {
-            //     title: info.event.extendedProps.description,
-            //     placement: 'top',
-            //     trigger: 'hover',
-            //     container: 'body'
-            // });
-            // console.log(info);
-            // if(info.event._def.extendedProps.streamer==1){
-            //   info.el.css("color","red");
-            // }
-
+            var tooltip = new Tooltip(info.el, {
+                title: info.event.extendedProps.description,
+                placement: 'top',
+                trigger: 'hover',
+                container: 'body'
+            });
+             tooltip.show();
         },
-        // eventMouseEnter: function(mouseEnterInfo){
-        //     $(mouseEnterInfo.el).css('background-color', 'black');
-            
-        // },
-        // eventMouseLeave: function(mousEventLeave){
-        //     $(mousEventLeave.el).css('background-color', 'orange');
-        // },
         loading: function(isLoading, view){
           if(isLoading){
             console.log("loading");

@@ -2,35 +2,44 @@
 
 {% block body %}
 <h1>Mon profil streamer</h1>
-
-<div class="container-fluid">
-    <div class="row col-4 mx-auto streamBoxProfil">
-        <div class="col-md-12 text-center">
-            <h2>{{ name }}</h2>
-                <p>mon id twitch : {{ twhitchId }}</p>
-            <h2>Mes activités</h2>
-        </div>
-        <div class="col-md-12 text-center">
-            <ul>
-                {% for item in activity %}
-                    <li>{{ item.name }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div class="col-md-12 text-center">
-            <img style="border-radius: 8px" src="{{ imgProfil }}" alt="avatar de {{ name }}">
-        </div>
-        <div class="col-md-12 text-center">
-            <form action="{{ path('streamerProfil') }}" method="POST" class="form-group">
-                <div >
-                    <label for="activity">ajouter une activité</label>
-                    <input id="bloodhound" class="typeahead form-control" type="text" placeholder="activité" name="activity">
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-md-4">
+            <div class="streamBoxProfil ">
+                <div class="text-center container">
+                    <img src="{{ imgProfil }}" alt="avatar de {{ name }}" class="img-responsive pt-3 img-rounded">
                 </div>
-                <input type="submit" clas="btn btn-primary">
-            </form>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="streamBoxProfil">
+                <div class="text-center">
+                    <h2>{{ name }}</h2>
+                    <p>mon id twitch : {{ twhitchId }}</p>
+                </div>
+                <div class="text-center">
+                    <h2>Mes activités</h2>
+                    <ul>
+                        {% for item in activity %}
+                            <li class="text-left">{{ item.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class=" col-12 col-md-4">
+            <div class="text-center streamBoxProfil">
+                <form action="{{ path('streamerProfil') }}" method="POST" class="pt-5">
+                    <div class="form-group">
+                        <input name="activity" id="bloodhound" class="typeahead form-control" type="text" placeholder="choisi une activité" >
+                    </div>
+                    <input type="submit" class="btn btn-primary mt-1" value="ajouter">
+                </form>
+            </div>
         </div>
     </div>
-</div>  
+</div>
+    
 {% endblock %}
 
 

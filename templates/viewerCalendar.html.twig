@@ -9,26 +9,22 @@
 
 {% block body %}
 
-<div class="container-fluid containerViewCal">
-
-    <h1 class="text-center" style="margin-top:25px;margin-bottom:25px;">mon calendrier</h1>
+<div class="container containerViewCal">
+    <h1 class="text-center" style="margin-top:10px;margin-bottom:25px;">mon calendrier</h1>
     <div class="row">
-        <div id="viewerCalendar" class="col-8 mx-auto p-3 streamCalendar"></div>
-            <div id="modalPlace"></div>
-                <div class="col-4">
-                <h6 class="streamerFav">mes streamers favoris :</h6>
-                <div>
-                    <ul>
-                        {% for fav in favStream %}
-                            <li class="list-unstyled">{{fav.name}}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+        <div id="viewerCalendar" class="col-9 mx-auto p-3 streamCalendar"></div>
+        <div id="modalPlace"></div>
+        <div class="col-3">
+            <h6 class="streamerFav">mes streamers :</h6>
+            <div>
+                <ul>
+                    {% for fav in favStream %}
+                        <li class="list-unstyled text-left">{{fav.name}}</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>
-   
-        
 </div>
 
 

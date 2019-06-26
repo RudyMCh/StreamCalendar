@@ -10,55 +10,53 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-4">    
-        
         </div>
-            <div class="col-md-4 boxRegister">
-                    <h1>Inscription</h1>
-                    {# formulaire de inscription bootstrap #}
-                    {% if connected is defined %}
-                        <p style="color:green">vous êtes déjà connecté</p>
-                    {% else %}
+        <div class="col-md-4 boxRegister">
+            <h1>Inscription</h1>
+                {# formulaire de inscription bootstrap #}
+                {% if connected is defined %}
+                    <p class="bg-success text-white rounded text-center">vous êtes déjà connecté</p>
+                {% else %}
                     {% if success is defined %}
-                        <p style="color:green"> compte créé, pour activer votre compte, cliquez sur le lien envoyé dans votre boîte mail</p>
+                        <p class="bg-success text-white rounded text-center"> compte créé, pour activer votre compte, cliquez sur le lien envoyé dans votre boîte mail</p>
                     {% else %}      
                 <form class="form-group" action="{{ path('register') }} " method="POST">
                     <fieldset class="">
                         <label for="email">email</label>
                         <input class="form-control" type="text" name="email" placeholder="email">
                         {% if errors.email is defined %}
-                            <p style="color:red">email incorrect</p>
+                            <p class="bg-danger text-white rounded text-center">email incorrect</p>
                         {% endif %}
                         {% if errors.alreadyUsed is defined %}
-                            <p style="color:red">email déjà utilisé</p>
+                            <p class="bg-danger text-white rounded text-center">email déjà utilisé</p>
                         {% endif %}
                         <label for="name">Nom</label>
-                            <input class="form-control" type="text" name="name" placeholder="Nom">
+                        <input class="form-control" type="text" name="name" placeholder="Nom">
                         {% if errors.name is defined %}
-                            <p style="color:red">nom incorrect</p>
+                            <p class="bg-danger text-white rounded text-center">nom incorrect</p>
                         {% endif %}
                             <label for="password">mot de passe</label>
                             <input class="form-control" type="password" name="password" placeholder="mot de passe">
                         {% if errors.password is defined %}
-                            <p style="color:red">mot de passe incorrect</p>
+                            <p class="bg-danger text-white rounded text-center">mot de passe incorrect</p>
                         {% endif %}
                         <label for="confirmPassword">Confirmez votre mot de passe</label>
                             <input class="form-control" type="password" name="confirmPassword" placeholder="Confirmez votre mot de passe">
                         {% if errors.confirmPassword is defined %}
-                            <p style="color:red">confirmation mot de passe incorrect</p>
+                            <p class="bg-danger text-white rounded text-center">confirmation mot de passe incorrect</p>
                         {% endif %}
                         {% if errors.errorMail is defined %}
-                            <p style="color:red">erreur lors de l'envoi du mail, réessayez</p>
+                            <p class="bg-danger text-white rounded text-center">erreur lors de l'envoi du mail, réessayez</p>
                         {% endif %}
                         <input class="btn btn-primary col-12 col-md-4 mt-2" type="submit" value="Valider">
                     </fieldset>
                 </form>
             </div>
         <div class="col-md-4">
-               
         </div>
     </div>
     {% endif %}
-    {% endif %}
+{% endif %}
 </div>
      
 {% endblock %}

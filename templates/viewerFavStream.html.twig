@@ -8,28 +8,37 @@
 {% endblock %}
 
 {% block body %}
+<h1>mes Streamers</h1>
 <div class="container">
-    <div class="row">
-        
-        <div class="liststreamer col-12 col-md-4 offset-3 favViewer" style="min-height:100px;">
-
-            {% if success is defined %}
-                <p style="color:green">Le streamer a bien été ajouté</p>
-            {% endif %}
-
+    <div class="row"> 
+        <div class="liststreamer col-12 col-md-4 mx-auto favViewer" style="min-height:100px;">
             <div id="bloodhound" class="col-8 mx-auto" style="min-height:100px">
-                <h5 class="text-center">Ajoutez un favoris :</h5>
-                <form class="form-group ml-1" action="{{ path('viewerFavStream') }}" method="POST">
-                    <input class="form-control typeahead" name="name" type="text" placeholder="nom du Streamer">
+                <form class="form-group ml-1 pt-5" action="{{ path('viewerFavStream') }}" method="POST">
+                    <input class="form-control typeahead mt-3" name="name" type="text" placeholder="choisissez un Streamer">
                     {% if errors.name is defined %}
                         <p style="color:red";>le format du nom n'est pas correct</p>
                     {% endif %}
                     {% if errors.notexist is defined %}
                         <p style="color:red";>ce streamer n'existe pas</p>
                     {% endif %}
-                    <input class="btn btn-primary mt-3" type="submit" value="Valider">
+                    <input class="btn btn-primary mt-3" type="submit" value="ajouter">
                 </form>
             </div>
+        </div>
+        <div class=" col-12 col-md-4 favViewer container" style="min-height: 100px">
+            <h5 class="text-white pt-3"> mes Streamers</h5>
+            {% if myFavStreamer is defined %}
+            <form action="{{ path('viewerFavStream') }}" method="GET">
+                <ul>
+                {% for streamer in myFavStreamer %}
+                    <li class="list-unstyled text-left text-white"> {{ streamer.name }}
+                        <input type="checkbox" class="checkbox" name="notFollowed[]" value="{{ streamer.name }}">
+                    </li>
+                {% endfor %}
+                </ul>
+                <button type="submit" class="btn btn-primary">ne plus suivre</button>
+            </form>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -37,7 +46,7 @@
 
 {% block javascripts %}
     <script src="{{asset('js/script-api.js')}}" type="text/javascript"></script>
-    
+    <script src="{{asset('js/scriptViewerFavStream.js') }}" type="text/javascript"></script>
     <script>
         var targetExtract = "{{ url('extract') }}";       
     </script>
