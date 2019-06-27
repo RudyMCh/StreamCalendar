@@ -323,16 +323,10 @@ class MainController extends AbstractController{
         $em = $this->getDoctrine()->getManager();
 
         $user = $em->merge($user);
-
-        dump($user);
-        
+       
         $user->getFavorite()->initialize();
         
-        dump($user);
         $myStreamers = $user->getFavorite();
-
-        dump($myStreamers);
-
 
         if(empty($myStreamers)){
             return $this->json(["empty" => true]);
@@ -349,7 +343,7 @@ class MainController extends AbstractController{
                         'color' => $event->getColor(),
                         'start' => $event->getStart()->format('Y-m-d H:i:s'),
                         'end' => $event->getEnd()->format('Y-m-d H:i:s'),
-                        'streamer' => $event->getStreamer()->getId()
+                        'streamer' => $event->getStreamer()->getName()
                     ];
                 };
             }

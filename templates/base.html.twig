@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<title>{% block title %}StreamCalendar{% endblock %}</title>
 	<link href='https://use.fontawesome.com/releases/v5.0.6/css/all.css' rel='stylesheet'>
-	<link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
 	<style>
 		@font-face {
 			font-family: 'Endgame', 'AUBREY1__';
@@ -135,8 +135,9 @@
 
 	<script src="{{ asset('js/jquery-3.4.1.min.js') }}"></script>
 	<script src="{{ asset('js/bootstrap.min.js') }}"></script>
-	<script src="https://unpkg.com/popper.js"></script>
-	<script src="https://unpkg.com/tooltip.js"></script>
+	<script src="{{ asset('js/popper.min.js') }}"></script>
+	<script src="{{ asset('js/tooltip.min.js') }}"></script>
+
 	{% block javascripts %}
 	{% endblock %}
 </body>

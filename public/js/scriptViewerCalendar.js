@@ -1,47 +1,5 @@
 $(function(){
 
-    // // constructs the suggestion engine
-
-    // var listStreamerJS = new Bloodhound({
-    //   datumTokenizer: Bloodhound.tokenizers.whitespace,
-    //   queryTokenizer: Bloodhound.tokenizers.whitespace,
-    //   // `states` is an array of state names defined in "The Basics"
-    //   local: listStreamer
-    // });
-
-    // $('#favoriteStreamer .typeahead').typeahead({
-    //   hint: true,
-    //   highlight: true,
-    //   minLength: 1
-    // },
-    // {
-    //   name: 'listStreamerJS',
-    //   source: listStreamerJS
-    // });
-
-    // var selectedStreamer;
-
-    // $('.typeahead').on('typeahead:selected', function(event, datum) {
-    //   selectedStreamer = datum;
-    // });
-    
-      // $('form').submit(function(e){
-      //   e.preventDefault();
-      //   console.log(selectedStreamer);
-      //   $.ajax({
-      //     type: "POST",
-      //     url: extractStreamer,
-      //     dataType:"json",
-      //     data: {"name": selectedStreamer},
-      //     success: function(data){
-      //       dataEvent = data;
-      //       console.log(data);
-      //     }
-
-      //   })
-        
-      // })
-
     var calendarEl = document.getElementById('viewerCalendar');
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -51,7 +9,6 @@ $(function(){
         plugins: [ 'dayGrid', 'timeGrid', 'bootstrap', 'interaction' ],
         defaultView: 'timeGridWeek',
         locale: 'fr',
-        themeSystem: "bootstrap",
         handleWindowResize: true,
         height: 600,
         contentHeight: 500,
@@ -85,12 +42,12 @@ $(function(){
         },
         eventRender: function(info) {
             var tooltip = new Tooltip(info.el, {
-                title: info.event.extendedProps.description,
+              html: true,
+                title: '<h5>' + info.event.extendedProps.streamer + '</h5>Description :<br>' + info.event.extendedProps.description,
                 placement: 'top',
                 trigger: 'hover',
                 container: 'body'
             });
-             tooltip.show();
         },
         loading: function(isLoading, view){
           if(isLoading){
@@ -109,6 +66,7 @@ $(function(){
         
         
         eventClick: function(info){
+          console.log(info);
             console.log(info.event._def.title);
             console.log(info.event._def.extendedProps.description);
         }

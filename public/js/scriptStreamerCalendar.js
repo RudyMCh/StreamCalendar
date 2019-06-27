@@ -68,15 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
-        // 3,
-        // eventMouseEnter: function(mouseEnterInfo){
-        //     console.log(mouseEnterInfo);
-        //     $(mouseEnterInfo.el).css('background-color', 'black');
-            
-        // },
-        // eventMouseLeave: function(mousEventLeave){
-        //     $(mousEventLeave.el).css('background-color', 'blue');
-        // },
+        eventRender: function(info) {
+            var tooltip = new Tooltip(info.el, {
+                html:true,
+                title: '<p> Description</p>' + info.event.extendedProps.description,
+                placement: 'top',
+                trigger: 'hover',
+                container: 'body'
+            });
+        },
         events:{
             url : targetExtract
         },
@@ -84,10 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
         themeSystem: 'bootstrap',
         
         eventDrop: function(info){
-            console.log(info);
-            console.log(info.event._def.publicId);
-            console.log(info.event._instance.range.start.toISOString());
-            console.log(info.event._instance.range.end.toISOString());
             $.ajax({
                 type: "POST",
                 url: targetUpdateDrop,
@@ -95,18 +91,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 data: {start: info.event._instance.range.start.toISOString(), end: info.event._instance.range.end.toISOString(), publicId: info.event._def.publicId },
                 success: function(data){
                     if(data.success){
-                        console.log("ok");
-                        console.log(data.info);
+
+                        $('.site-footer').before('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement déplacé avec succès</p>');
+                        setTimeout(function(){
+                            $('.success').remove();
+                        }, 4000);
+                        
                     }
                     if(data.error){
-                        console.log(data.event);
+                        $('.site-footer').before('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">problème rencontré</p>');
+                        setTimeout(function(){
+                            $('.success').remove();
+                        }, 4000);
                     }
                 },
             })
         },       
         eventResize: function(info){
-            console.log('resize');
-            console.log(info);
             $.ajax({
                 type: "POST",
                 url: targetUpdateResize,
@@ -114,14 +115,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 data: {end: info.event._instance.range.end.toISOString(), publicId: info.event._def.publicId},
                 success: function(data){
                     if(data.success){
+                        $('.site-footer').before('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement modifié avec succès</p>');
+                        $('#myModal1').remove();
+                        setTimeout(function(){
+                            $('.success').remove();
+                        }, 4000);
 
                     }else{
-                        console.log("pas ok");
+                        $('.site-footer').before('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">problème rencontré</p>');
+                        setTimeout(function(){
+                            $('.error').remove();
+                        }, 4000);
                     }
 
                 }, error: function(data){
                     if(data.error){
-                        console.log("erreur ajax");
                     }
                 }
             })
@@ -177,17 +185,27 @@ document.addEventListener('DOMContentLoaded', () => {
                         data: $form.serialize(),
                         success: function(data){
                             if(data.success){
-                                $('.success').remove();
-                                $('.info').after('<p class="bg-success text-white text-center">évènement créé avec succès</p>');
+                                $('.site-footer').before('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement créé avec succès</p>');
                                 $('#myModal1').remove();
+                                setTimeout(function(){
+                                    $('.success').remove();
+                                }, 4000);
+                                
                                 calendar.refetchEvents();
                             }else{
-                                $('#bloodhound').append('<p class="bg-danger text-white rounded text-center">ce jeux ne fait pas parti de vos favoris</p>')
+                                $('#myModal1').remove();
+                                $('.site-footer').before('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">ce jeux ne fait pas parti de vos activités</p>');
+                                setTimeout(function(){
+                                    $('.error').remove();
+                                }, 4000);
                             }
                         },
                         error: function(data){
                             if(data.errors){
-                                setError($description, "pb bdd");
+                                $('.site-footer').before('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">pb bdd</p>');
+                                setTimeout(function(){
+                                    $('.error').remove();
+                                }, 4000);
                             }
                         }
                     })                            
@@ -213,14 +231,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     data:{publicId: info.event._def.publicId},
                     success: function(data){
                         if(data.success){
+                            $('.site-footer').before('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement supprimé avec succès</p>');
                             $('#myModal2').remove();
-                            calendar.refetchEvents();
+                            setTimeout(function(){
+                                $('.success').remove();
+                            }, 4000);
                         }
                     },
                     error: function(data){
                         $('#myModal2').remove();
-                        alert("suppression échouée")
-
+                        $('.site-footer').before('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">échec de suppression</p>');
+                        setTimeout(function(){
+                            $('.error').remove();
+                        }, 4000);
                     }
                 })
 

@@ -6,10 +6,10 @@ connexion
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-4 offset-md-4 boxLogin">
-            <h1>Connexion</h1>
+                <h1>Connexion</h1>
             {# formulaire de connexion bootstrap #}
             {% if success is defined %}
-                <p class="text-white rounded lg text-center" style="font-size:2em">vous êtes connecté</p>
+                <p class="text-white rounded text-center" style="font-size:2em">vous êtes connecté</p>
 
             {% else %}
                 <form class="form-group" action="{{ path('login') }} " method="POST">
