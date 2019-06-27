@@ -1,6 +1,3 @@
-function setError($input, msgText){
-    $input.after('<p class="error bg-danger text-white text-center">' + msgText + '</p>');
-}
 var modalEvent = `
 <div id="myModal2" class="modal col-12">
     <div class="modal-content form-group">
@@ -71,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         eventRender: function(info) {
             var tooltip = new Tooltip(info.el, {
                 html:true,
-                title: '<p> Description</p>' + info.event.extendedProps.description,
+                title: '<div class="card"><div class="card-body"><p class="card-title font-weight-bold" style="wrap: nowrap; border-bottom:solid #0069D9 1px;" >' + info.event.title + '</p><p class="card-text"><br>' + info.event.extendedProps.description+'</p></div></div>',
                 placement: 'top',
                 trigger: 'hover',
                 container: 'body'
@@ -91,15 +88,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 data: {start: info.event._instance.range.start.toISOString(), end: info.event._instance.range.end.toISOString(), publicId: info.event._def.publicId },
                 success: function(data){
                     if(data.success){
-
-                        $('.site-footer').before('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement déplacé avec succès</p>');
+                        $('.tooltip').remove();
+                        calendar.refetchEvents();
+                        $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded  col-12 col-md-2 success text-white text-center">évènement déplacé avec succès</p>');
                         setTimeout(function(){
                             $('.success').remove();
                         }, 4000);
-                        
                     }
                     if(data.error){
-                        $('.site-footer').before('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">problème rencontré</p>');
+                        $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="col-12 col-md-2 error text-white text-center">problème rencontré</p>');
                         setTimeout(function(){
                             $('.success').remove();
                         }, 4000);
@@ -115,14 +112,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 data: {end: info.event._instance.range.end.toISOString(), publicId: info.event._def.publicId},
                 success: function(data){
                     if(data.success){
-                        $('.site-footer').before('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement modifié avec succès</p>');
-                        $('#myModal1').remove();
+                        $('.tooltip').remove();
+                        calendar.refetchEvents();
+                        $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mb-3 mx-auto col-12 col-md-2 success text-white text-center">évènement modifié avec succès</p>');
                         setTimeout(function(){
                             $('.success').remove();
                         }, 4000);
 
+
                     }else{
-                        $('.site-footer').before('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">problème rencontré</p>');
+                        $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">problème rencontré</p>');
                         setTimeout(function(){
                             $('.error').remove();
                         }, 4000);
@@ -135,8 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         },
         select: function(info){
-            console.log("début : " + info.start.toISOString() + " to " + info.endStr);
-            console.log(info);
             $('.error').remove();
             $('p.success').remove();
             //add a listener on the div modalPlace et on cree un formulaire modal
@@ -171,10 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 
                 if($title.length ==0){
-                    setError($title, 'champ titre vide');
-                }
-                if($description.length ==0){
-                    setError($description, 'champ activité vide');
+                    $($title).after('<p class="bg-danger error text-white text-center"></p>le champs titre ne peut pas être vide</p>')
                 }
                 if($('.error').length == 0){
                     //si pas d'ereur, on fait la requête AJAX pour traiter le formulaire et joindre la base de données
@@ -185,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         data: $form.serialize(),
                         success: function(data){
                             if(data.success){
-                                $('.site-footer').before('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement créé avec succès</p>');
+                                $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement créé avec succès</p>');
                                 $('#myModal1').remove();
                                 setTimeout(function(){
                                     $('.success').remove();
@@ -194,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 calendar.refetchEvents();
                             }else{
                                 $('#myModal1').remove();
-                                $('.site-footer').before('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">ce jeux ne fait pas parti de vos activités</p>');
+                                $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">ce jeux ne fait pas parti de vos activités</p>');
                                 setTimeout(function(){
                                     $('.error').remove();
                                 }, 4000);
@@ -202,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         error: function(data){
                             if(data.errors){
-                                $('.site-footer').before('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">pb bdd</p>');
+                                $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">pb bdd</p>');
                                 setTimeout(function(){
                                     $('.error').remove();
                                 }, 4000);
@@ -213,7 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         },
         eventClick: function(info){
-            console.log(info);
             var $modal = $('#modalPlace');
             $modal.append(modalEvent);
             $('#myModal2').css('display', 'block');
@@ -231,16 +224,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     data:{publicId: info.event._def.publicId},
                     success: function(data){
                         if(data.success){
-                            $('.site-footer').before('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement supprimé avec succès</p>');
+                            $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement supprimé avec succès</p>');
                             $('#myModal2').remove();
                             setTimeout(function(){
                                 $('.success').remove();
                             }, 4000);
+                            calendar.refetchEvents();
                         }
                     },
                     error: function(data){
                         $('#myModal2').remove();
-                        $('.site-footer').before('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">échec de suppression</p>');
+                        $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">échec de suppression</p>');
                         setTimeout(function(){
                             $('.error').remove();
                         }, 4000);

@@ -43,7 +43,7 @@ $(function(){
         eventRender: function(info) {
             var tooltip = new Tooltip(info.el, {
               html: true,
-                title: '<h5>' + info.event.extendedProps.streamer + '</h5>Description :<br>' + info.event.extendedProps.description,
+                title: '<div class="card"><div class="card-body"><p class="card-title font-weight-bold" style="wrap: nowrap; border-bottom:solid #0069D9 1px;" >' + info.event.extendedProps.streamer + '</p><p class="card-text"><br>' + info.event.extendedProps.description+'</p></div></div>',
                 placement: 'top',
                 trigger: 'hover',
                 container: 'body'

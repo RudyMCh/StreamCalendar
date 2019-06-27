@@ -10,12 +10,12 @@
 {% block body %}
 
 <div class="container containerViewCal">
-    <h1 class="text-center" style="margin-top:10px;margin-bottom:25px;">mon calendrier</h1>
+    <h1 class="text-left" style="margin-top:10px;margin-bottom:8px;">mon calendrier</h1>
     <div class="row">
-        <div id="viewerCalendar" class="col-9 mx-auto p-3 streamCalendar"></div>
+        <div id="viewerCalendar" class="col-12 col-md-9 mx-auto p-3 streamCalendar"></div>
         <div id="modalPlace"></div>
-        <div class="col-3">
-            <h6 class="streamerFav">mes streamers :</h6>
+        <div class="col-12 col-md-3">
+            <h6 class="streamerFav text-left" style="text-justify:auto;border-bottom:solid rgba(0, 105, 217,0.8) 1px;">streamers suivis :</h6>
             <div>
                 <ul>
                     {% for fav in favStream %}
