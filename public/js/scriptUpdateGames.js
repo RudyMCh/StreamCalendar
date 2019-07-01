@@ -82,7 +82,7 @@ $.ajax({
                 <div class="card mb-3 col-2 text-center">
                     <img class="card-img-top " src="` + escapeHtml(resize(game.box_art_url)) + `" alt="Card image cap">
                     <div class="card-body">
-                        <h5 class="card-title">TITRE: `+ escapeHtml(game.name) +`</h5>
+                        <h5 class="card-title">`+ escapeHtml(game.name) +`</h5>
                         <p class="card-text">`+escapeHtml(game.id)+`</p>
                         <a href="#" class="btn btn-primary" onclick="sendPost('`+escapeHtml(game.id)+`','`+escapeHtml(game.name)+`','`+escapeHtml(game.box_art_url)+`')">Ajouter ce jeu en base de données</a>
                     </div>
