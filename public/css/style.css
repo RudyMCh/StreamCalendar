@@ -1,6 +1,14 @@
 body{
     background-color: rgb(202, 211, 214);
-    
+}
+/* set an overlay onto the current page while performing AJAX function */
+.overlay{
+  position:absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.7);
 }
 /* nous ciblons chacun des titres pour appliquer couleur bleue et centrage du texte, et police personnalisée */
 h2, h3, h4, h5, h6{

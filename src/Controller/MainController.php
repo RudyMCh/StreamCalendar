@@ -714,62 +714,74 @@ class MainController extends AbstractController{
     * @Route("/admin-maj-game/", name="updateGames")
     */
     public function updateGames(Request $request){
-
-
-            //vérification si déjà connecté
+        //we check whether or not already connected
         $session= $this->get('session');
         if(!$session->has('account')){
             return $this->redirectToRoute('login');
         }
+        $type = $session->get('account')->getType();
+        if($type!=2){
+            throw new NotFoundHttpException('accès non autorisé');
+        }
+        $gameRepo = $this->getDoctrine()->getRepository(Activity::class);        
+        $gList = $gameRepo->findAllTwitchCode();
+        $gList = json_encode($gList);
 
-        if($session->has('account')){
-            $type = $session->get('account')->getType();
-            if($type!=2){
-                throw new NotFoundHttpException('accès non autorisé');
+        // we check out the data from POST if any
+        if($request->isMethod('post')){
+            // we fetch the data
+            $twitch_code = $request->request->get('id');
+            $name = $request->request->get('name');
+            $game_image = $request->request->get('pic');
+            $gameRepo = $this->getDoctrine()->getRepository(Activity::class);        
+            $gamesIfExist = $gameRepo->findOneByTwitchCode($twitch_code);
+            if (!empty($gamesIfExist)){
+                $errors['AlreadyExist']= true;
             }
-            // appel des variables
-            if($request->isMethod('post')){
-                // Récupération données post
-                $twitch_code = $request->request->get('id');
-                $name = $request->request->get('name');
-                $game_image = $request->request->get('pic');
-                $gameRepo = $this->getDoctrine()->getRepository(Activity::class);        
-                $gamesIfExist = $gameRepo->findOneById($twitch_code);
-
-                if (!empty($gamesIfExist)){
-                    $errors['AlreadyExist']= true;
-                }
-
-                if(!preg_match('#^[0-9]{1,20}$#',$twitch_code)){
-                    $errors['twitchId']= true;
-                }
-                if(!preg_match('#^.{2,255}$#',$name)){
-                    $errors['game']= true;
-                }
-                if(!preg_match('#^.{2,350}$#',$game_image)){
-                    $errors['link']= true;
-                }
-                // Si pas d'erreurs
-                if(!isset($errors)){    
-                    // Création d'un nouveau jeu
-                    $newGames = new Activity();
-                // on hydrate $newGames
-                    $newGames
-                        ->setTwitchCode($twitch_code)
-                        ->setName($name)
-                        ->setGameImage($game_image)
-                    ;
-                // Récupération du manager des entités
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($newGames);
-                    $em->flush();
-                    return $this->render('updateGames.html.twig', ['success' => true]);
-                }
+            if(!preg_match('#^[0-9]{1,20}$#',$twitch_code)){
+                $errors['twitchId']= true;
             }
-            return $this->render('updateGames.html.twig',['errors' => false]); 
-        } 
-    return $this->render('updateGames.html.twig');
+            if(!preg_match('#^.{2,255}$#',$name)){
+                $errors['game']= true;
+            }
+            if(!preg_match('#^.{2,350}$#',$game_image)){
+                $errors['link']= true;
+            }
+            // if no error we go ahead to save the game in the database
+            if(!isset($errors)){    
+                // we create the new game
+                $newGame = new Activity();
+                $newGame
+                    ->setTwitchCode($twitch_code)
+                    ->setName($name)
+                    ->setGameImage($game_image)
+                ;
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($newGame);
+                $em->flush(); // new game is successfully saved in the database
+                $gList = $gameRepo->findAllTwitchCode(); // contains the list of all twitch_code already recorded in the database
+                $gList=json_encode($gList);
+                return $this->render('updateGames.html.twig', ['gList' => $gList]); // we pass gList to the view
+            }
+            return $this->render('updateGames.html.twig', ['errors' => $errors]); // actually errors is now useless and needs further treatment for being processed in the view
+        }
+        return $this->render('updateGames.html.twig', ['gList' => $gList]); 
     }
+
+    /**
+     * @Route("/game-exist/", name="gameExist")
+     * 
+     */
+    public function game_exist($twitch_code) {
+        $gameRepo = $this->getDoctrine()->getRepository(Activity::class);        
+        $gamesIfExist = $gameRepo->findOneByTwitchCode($twitch_code);
+        if (!empty($gamesIfExist)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * @Route("/demande-passage-a-streamer/", name="isInProcess")
      * 
