@@ -55,4 +55,23 @@ class ActivityRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findOneByTwitchCode($value)
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.twitch_code = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function findAllTwitchCode()
+    {
+    $sql = "SELECT twitch_code FROM Activity";
+    $resp = $this->getEntityManager()->getConnection()->prepare($sql);
+    $resp->execute([]);
+    return $resp->fetchAll();
+    }
+
 }

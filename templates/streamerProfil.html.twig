@@ -47,9 +47,9 @@
 <script src="{{ asset('js/typeahead.bundle.js') }}"></script>   
 <script>
     // constructs the suggestion engine
-var activityList = {{ activityList|escape|json_encode|raw }};
-//var activityList = ['test'];
-var activity = new Bloodhound({
+    var activityList = {{ activityList|escape|json_encode|raw }};
+    //var activityList = ['test'];
+    var activity = new Bloodhound({
     datumTokenizer: Bloodhound.tokenizers.whitespace,
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     
@@ -65,8 +65,6 @@ $('#bloodhound.typeahead').typeahead({
     name: 'activity',
     source: activity
 });
-
-
 
 </script>
 

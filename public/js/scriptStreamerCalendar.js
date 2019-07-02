@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         select: function(info){
             $('.error').remove();
             $('p.success').remove();
-            //add a listener on the div modalPlace et on cree un formulaire modal
+            //add a listener on the div modalPlace and create a modal form
             var $modal = $('#modalPlace');
             $modal.append(modalNewEvent);
             var activity = new Bloodhound({
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     $($title).after('<p class="bg-danger error text-white text-center"></p><i class="fas fa-exclamation-circle"></i> le champs titre ne peut pas être vide</p>')
                 }
                 if($('.error').length == 0){
-                    //si pas d'ereur, on fait la requête AJAX pour traiter le formulaire et joindre la base de données
+                    //if no error, we perform AJAX quiry to handle the form
                     $.ajax({
                         type: "POST",
                         url: targetInsert,

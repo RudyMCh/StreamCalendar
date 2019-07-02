@@ -33,7 +33,7 @@
 
 			<div class="collapse navbar-collapse" id="navbarText">
 				<ul class="navbar-nav mr-auto ">
-					<!-- accessible à tout le monde -->
+					<!-- accessible for everyone -->
 					<li class="nav-item {% if  way =='home' %} active bg-success rounded{% endif %}">
 						<a class="nav-link " href="{{ path('home')}}">Accueil</a>
 					</li>
@@ -58,7 +58,7 @@
 					</li>
 					{% endif %}
 
-					{# menu calendrier streamer uniquement si streamer #}
+					{# menu calendar only for streamer #}
 					<!-- session streamer myCalendar -->
 					{% if app.session.has('account') and app.session.get('account').type >= 1 %}
 					<li class="nav-item {% if  way =='myCalendar' %} active bg-success rounded{% endif %}">
@@ -87,7 +87,6 @@
 		{% block body %}
 
 		{% endblock %}
-
 
 	</div>
 	<!-- FOOTER -->
@@ -131,7 +130,6 @@
                 <p>fièrement propulsé par nous-même</p>
         </footer> -->
 	</div>
-
 
 	<script src="{{ asset('js/jquery-3.4.1.min.js') }}"></script>
 	<script src="{{ asset('js/bootstrap.min.js') }}"></script>

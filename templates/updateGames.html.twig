@@ -5,16 +5,27 @@
 
     <div class="container-fluid">
         <div class="row">
-                <div id="infoGames"></div>
+            <div class="mx-auto">
+                <h4 class="text-center mt-2 mb-4">Merci de patienter pendant le traitement</h4>
+            </div>
         </div>
-        
+        <div class="row">
+            <div id="infoGames"></div>
+        </div>
     </div>
 
 {% endblock %}
 {% block javascripts %}
-
+<script>
+    var gL1='{{gList}}'.replace(/{&quot;/g,'"'); // string including twitch_code of all games already recorded in the database 
+    var gL2=gL1.replace(/&quot;}/g,'"');
+    var gL3=gL2.replace(/&quot;/g,'"');
+    var gL4= gL3.replace(/"twitch_code":/g,'');
+    var gList=JSON.parse(gL4); // we finaly get it back into an array
+</script>
 <script src="{{ asset('js/scriptUpdateGames.js') }}"></script>
 <script>
+    // url leading to the code for form treatment 
     var targetUpdateGames = '{{ url('updateGames') }}';
 </script>
 {% endblock %}

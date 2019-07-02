@@ -17,7 +17,7 @@
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
 <script>
-// Fonction qui échappe les métacaractères HTML (équivalent de htmlspecialchars PHP)
+// Function to escape HTML metachars (same as PHP native function htmlspecialchars)
         function escapeHtml(text) {
             text = text.toString();
             var map = {
@@ -31,7 +31,7 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-            // On fait une requête AJAX sur le site API Twitch Game pour récupérer les 100 premiers Games actuels en diffusion
+            // we fetch the 100 first currently streaming games from twitch API using AJAX quiry
             
             $.ajax({
 
@@ -48,7 +48,7 @@
                 },
                 
                 error: function(){
-                    // La requête AJAX a échoué, donc message d'erreur
+                    // AJAX failed, so error message
                     displayMsg('Erreur lors de la récupération des données');
                 }
             });

@@ -62,7 +62,7 @@ class MainController extends AbstractController{
         $session = $this->get('session');
         if($session->has('account')){
             return $this->redirectToRoute('home');
-            //ou alors
+            //elsewhere
             //throw new AccessDenied
         }else{
             if
@@ -123,28 +123,25 @@ class MainController extends AbstractController{
      * @Route("/inscription/", name="register")
      */
     public function register(Request $request, Swift_Mailer $mailer){
-
-       
-        //vérification si déjà connecté
+        //already connected or not ?
         $session = $this->get('session');
         if($session->has('account')){
             return $this->redirectToRoute('home');
         }else{
-
-            //récupération des données POST
+            //if not we fetch POST data
             $email = $request->request->get('email');
             $name = $request->request->get('name');           
             $password = $request->request->get('password');
             $confirmPassword = $request->request->get('confirmPassword');
             //$reCaptcha = $request->request->get('g-recaptcha-response');
             
-            //appel des variables
+            //variables checking list
             if
             (
                $request->isMethod('post')
             )
             {
-                //bloc des vérifs
+                //verifications
                 if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                     $errors['email'] =  true;
                 }
@@ -160,17 +157,16 @@ class MainController extends AbstractController{
                 // if(!$recaptcha->isValid($reCaptcha, $request->server->get('REMOTE_ADDR'))){
                 //     $errors['reCaptcha'] = true;
                 // }
-                //traitement si pas d'erreurs
+                //if no error:
                 if(!isset($errors)){
-                    //verification si mail déjà utilisé
+                    //is email already used ?
                     $userRepo = $this->getDoctrine()->getRepository(User::class);
                     $userVerif = $userRepo-> findOneByEmail($email);
                     if(empty($userVerif)){
-                        //création d'un nouvel utilisateur
+                        //we create a new user
                         $user = new User();
                         $token= md5(rand());
-
-                        //hydratation de $user
+                        // we hydrate $user
                         $user
                             ->setEmail($email)
                             ->setName($name)
@@ -179,9 +175,9 @@ class MainController extends AbstractController{
                             ->setToken($token)
                             ->setType(0)
                             ->setInProcess(0)
-
                         ;
-                        //récupération du manageur des entités
+                        dump($user);
+                        //we load entity manager
                         $em = $this->getDoctrine()->getManager();
                         $em->persist($user);
                         $em->flush();
@@ -247,15 +243,13 @@ class MainController extends AbstractController{
         }
     }
     
-
     /**
-     * @Route("/extraction", name="extract")
+     * @Route("/extraction/", name="extract")
      * 
-     * fonction pour extraire les evenements créés par un streamer sur son agenda,
-     *  utilisé par javascript fullcalendar fonction events
+     * function for extracting events created by a streamer on it's own calendar,
+     *  used by javascript fullcalendar events function
      */
-    public function extract()
-    {   
+    public function extract(){   
         $session=$this->get('session');
         $user =$session->get('account');
         $eventRepository = $this->getDoctrine()->getRepository(Event::class);
@@ -280,8 +274,7 @@ class MainController extends AbstractController{
     }
 
     /**
-     * @Route("/extractStreamer", name="extractStreamer")
-     * 
+     * @Route("/extractStreamer/", name="extractStreamer")
      * 
      */
     public function extractStreamer(Request $request){
@@ -308,23 +301,17 @@ class MainController extends AbstractController{
     }
 
     /**
-     * @Route("/extractFavoritesEvents",name="extractFavoritesEvents" )
+     * @Route("/extractFavoritesEvents/",name="extractFavoritesEvents")
      * 
-     * fonction pour extraire les evenements de streamer favoris du user actuel, page viewerCalendar
+     * function for page viewerCalendar, for extracting favorite streamer events of the connected user
      */
     public function extractFavoritesEvents(){
         $session=$this->get('session');
-
         $user=$session->get('account');
-
         $em = $this->getDoctrine()->getManager();
-
         $user = $em->merge($user);
-       
         $user->getFavorite()->initialize();
-        
         $myStreamers = $user->getFavorite();
-
         if(empty($myStreamers)){
             return $this->json(["empty" => true]);
         }else{
@@ -351,10 +338,9 @@ class MainController extends AbstractController{
     /**
      * @Route("/insertion", name="insert")
      * 
-     * fonction pour insérer un evenement par un streamer, utilisé par fullcalendar, fonction select, streamcalendar.js
+     * function for a streamer to add an event, used by fullcalendar, function select, streamcalendar.js
      */
-    public function insert(Request $request)
-    {
+    public function insert(Request $request){
         $session= $this->get('session');
         if($request->isMethod('post')){
             $title = $request->request->get('title');
@@ -375,7 +361,6 @@ class MainController extends AbstractController{
             if(!preg_match('#^.{1,200}$#', $end)){
                 $errors['end']= true;   
             }
-
             if(!isset($errors)){
                 $user = $session->get('account');
                 $id=$user->getId();
@@ -411,9 +396,8 @@ class MainController extends AbstractController{
     /**
      * @Route("/mise-a-jour-deplacement/", name="updateDrop")
      * 
-     * 
-     * fonction pour mettre à jour en bdd un evenement qui est déplacé sur le calendrier du streamer
-     * utilisé par fullcalendar, fonction eventDrop
+     * function to update a streamer calendar event efter moved to another time
+     * used by fullcalendar, function eventDrop
     */
     public function updateDrop(Request $request){
         if($request->isMethod("POST")){
@@ -423,12 +407,9 @@ class MainController extends AbstractController{
             $er= $this->getDoctrine()->getRepository(Event::class);
             $event = $er->findOneById($publicId);
             $event->setStart($start)->setEnd($end);
-
             $em= $this->getDoctrine()->getManager();
             $em->flush();
-            
-
-        return $this->json(["success" => true]);
+            return $this->json(["success" => true]);
         }else{
             return $this->json(['error' =>true]);
         }
@@ -437,23 +418,23 @@ class MainController extends AbstractController{
     /**
      * @Route("/mise-a-jour-resize/", name="updateResize")
      * 
-     * fonction pour mettre à jour un evenement quand sa durée est modifiée
-     * utilisée par fullcalendar, fonction eventresize
+     * function to update an event after duration is modified
+     * used by fullcalendar, function eventresize
     */
     public function updateResize(Request $request){
         if($request->isMethod("POST")){
-            //récupréation des données envoyé par la requête AJAX
+            //we fetch data sent out by AJAX quiry
             $publicId = $request->request->get('publicId');
             $end = new DateTime($request->request->get('end'));
-            //appel de l'objet event coorespondant à la modification
+            //we get the object to be updated from class Event
             $er= $this->getDoctrine()->getRepository(Event::class);
             $event = $er->findOneById($publicId);
-            //hydratation de la nouvelle fin de l'évênement
+            //we hydrate the new end time data of the event
             $event->setEnd($end);
-            //appel du manager et enregistrement en bdd
+            //we save in database
             $em= $this->getDoctrine()->getManager();
             $em->flush();
-            //renvoi du message de succès en JSON
+            //we return success message using JSON format
             return $this->json(["success" => true]);
         }else{
             return $this->json(["success" => false]);
@@ -463,11 +444,11 @@ class MainController extends AbstractController{
     /**
      * @Route("/supprimer-un-evenement/", name="deleteEvent")
      * 
-     * fonction pour supprimer un evenement, utilisée par fullcalendar, fonction eventClick
+     * function to delete an event, used by fullcalendar, function eventClick
      */
     public function deleteEvent(Request $request){
         if($request->isMethod("POST")){
-            //récupréation des données envoyé par la requête AJAX
+            //we fetch data sent out by AJAX quiry
             $publicId = $request->request->get('publicId');
             $er=$this->getDoctrine()->getRepository(Event::class);
             $event=$er->findOneById($publicId);
@@ -492,12 +473,9 @@ class MainController extends AbstractController{
         $user = $em->merge($user);
         // we fetch and load the favorite streamers list for further sending to the view
         $favStream = $user->getFavorite();
-
         return $this->render('viewerCalendar.html.twig', array("favStream" => $favStream));
     }
-
    
-    
     /**
      * @Route("/mon-profil-viewer/", name="viewerProfile")
      */
@@ -519,6 +497,7 @@ class MainController extends AbstractController{
             }
             //if no error
             if(!isset($errors)){
+                $er = $this->getDoctrine()->getRepository(User::class);
                 $userVerif = $er->findOneByEmail($email); // we check ou whether or not the email is already existing
                 $em = $this->getDoctrine()->getManager();
                 $user = $this->get('session')->get('account');
@@ -584,8 +563,6 @@ class MainController extends AbstractController{
                 $str=$er->findOneByName($name);
                 // if favorite was found so we save it in the database
                 if (!empty($str)) {
-                    
-                    
                     $user->addFavorite($str);
                     $em->flush();
                     return $this->render('viewerFavStream.html.twig', ['success'=>true, 'streamerList' => $list, "myFavStreamer" => $listStreamer]);
@@ -618,24 +595,20 @@ class MainController extends AbstractController{
         $user->setTokenInProcess(md5(rand()));
         $em->flush();
         $session->set('account', $user); // we update the session variable
-          
-
-
         return $this->redirectToRoute('viewerProfile');
-
     }
     
     /**
      * @Route("/mon-profil-streamer/", name="streamerProfil")
      */
     public function streamerProfil(Request $request){
-        //verif session
+        //we check session info
         $session = $this->get('session');
         if(!$session->has('account') || $session->get('account')->getType()<1){
             throw new NotFoundHttpException('non autorisé'); 
         }else{
-            //si session, on force l'hydratation de user pour récupérer sa collection d'activité favorite pour lui proposer
-            // un choix restraint et pour attribuer une couleur à ses activités
+            //if connected:
+            // we fetch user all favorite activities so he can choose among them and affect a color by activity
             $user = $session->get('account');
             $um= $this->getDoctrine()->getManager();
             $user=$um->merge($user);
@@ -646,9 +619,10 @@ class MainController extends AbstractController{
                 $activityList[]=$activity->getName();
             }
             if($request->isMethod('POST')){
-                //enregistrement de l'activité choisie dans la page profil
+                //we save the activity selected in the profile page
                 $activityChosen = $request->request->get('activity');
-                //verif de $activityChosen dans activityList à faire!!!!!!!!
+                dump($activityChosen);
+                // need to do further verification for $activityChosen from activityList !!!!!!!!
                 if(!isset($errors)){
                     $activityRegistered = $ar->findOneByName($activityChosen);
                     $user->addActivity($activityRegistered);
@@ -663,19 +637,14 @@ class MainController extends AbstractController{
             "imgProfil" => str_replace("300x300", "150x150",$user->getProfilImage()),
             "activityList" => $activityList
         ));
-    
     }
-
-    
 
     /**
      * @Route("/administration-backend/", name="adminBackend")
      */
     public function adminBackend(Request $request, Swift_Mailer $mailer){
-
-        //vérification si déjà connecté
+        //we check whether or not we are already connected
             $session = $this->get('session');
-    
             if(!$session->has('account')){
                 return $this->redirectToRoute('login');
             }
@@ -688,7 +657,6 @@ class MainController extends AbstractController{
                     return $this->render('adminBackend.html.twig');
                 }
             }
-    
             return $this->render('adminBackend.html.twig');
         }
     
@@ -696,66 +664,78 @@ class MainController extends AbstractController{
     * @Route("/admin-maj-game/", name="updateGames")
     */
     public function updateGames(Request $request){
-
-            //vérification si déjà connecté
+        //we check whether or not already connected
         $session= $this->get('session');
         if(!$session->has('account')){
             return $this->redirectToRoute('login');
         }
+        $type = $session->get('account')->getType();
+        if($type!=2){
+            throw new NotFoundHttpException('accès non autorisé');
+        }
+        $gameRepo = $this->getDoctrine()->getRepository(Activity::class);        
+        $gList = $gameRepo->findAllTwitchCode();
+        $gList = json_encode($gList);
 
-        if($session->has('account')){
-            $type = $session->get('account')->getType();
-            if($type!=2){
-                throw new NotFoundHttpException('accès non autorisé');
+        // we check out the data from POST if any
+        if($request->isMethod('post')){
+            // we fetch the data
+            $twitch_code = $request->request->get('id');
+            $name = $request->request->get('name');
+            $game_image = $request->request->get('pic');
+            $gameRepo = $this->getDoctrine()->getRepository(Activity::class);        
+            $gamesIfExist = $gameRepo->findOneByTwitchCode($twitch_code);
+            if (!empty($gamesIfExist)){
+                $errors['AlreadyExist']= true;
             }
-            // appel des variables
-            if($request->isMethod('post')){
-                // Récupération données post
-                $twitch_code = $request->request->get('id');
-                $name = $request->request->get('name');
-                $game_image = $request->request->get('pic');
-                $gameRepo = $this->getDoctrine()->getRepository(Activity::class);        
-                $gamesIfExist = $gameRepo->findOneById($twitch_code);
-
-                if (!empty($gamesIfExist)){
-                    $errors['AlreadyExist']= true;
-                }
-
-                if(!preg_match('#^[0-9]{1,20}$#',$twitch_code)){
-                    $errors['twitchId']= true;
-                }
-                if(!preg_match('#^.{2,255}$#',$name)){
-                    $errors['game']= true;
-                }
-                if(!preg_match('#^.{2,350}$#',$game_image)){
-                    $errors['link']= true;
-                }
-                // Si pas d'erreurs
-                if(!isset($errors)){    
-                    // Création d'un nouveau jeu
-                    $newGames = new Activity();
-                // on hydrate $newGames
-                    $newGames
-                        ->setTwitchCode($twitch_code)
-                        ->setName($name)
-                        ->setGameImage($game_image)
-                    ;
-                // Récupération du manager des entités
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($newGames);
-                    $em->flush();
-                    return $this->render('updateGames.html.twig', ['success' => true]);
-                }
+            if(!preg_match('#^[0-9]{1,20}$#',$twitch_code)){
+                $errors['twitchId']= true;
             }
-            return $this->render('updateGames.html.twig',['errors' => false]); 
-        } 
-    return $this->render('updateGames.html.twig');
+            if(!preg_match('#^.{2,255}$#',$name)){
+                $errors['game']= true;
+            }
+            if(!preg_match('#^.{2,350}$#',$game_image)){
+                $errors['link']= true;
+            }
+            // if no error we go ahead to save the game in the database
+            if(!isset($errors)){    
+                // we create the new game
+                $newGame = new Activity();
+                $newGame
+                    ->setTwitchCode($twitch_code)
+                    ->setName($name)
+                    ->setGameImage($game_image)
+                ;
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($newGame);
+                $em->flush(); // new game is successfully saved in the database
+                $gList = $gameRepo->findAllTwitchCode(); // contains the list of all twitch_code already recorded in the database
+                $gList=json_encode($gList);
+                return $this->render('updateGames.html.twig', ['gList' => $gList]); // we pass gList to the view
+            }
+            return $this->render('updateGames.html.twig', ['errors' => $errors]); // actually errors is now useless and needs further treatment for being processed in the view
+        }
+        return $this->render('updateGames.html.twig', ['gList' => $gList]); 
     }
+
+    /**
+     * @Route("/game-exist/", name="gameExist")
+     * 
+     */
+    public function game_exist($twitch_code) {
+        $gameRepo = $this->getDoctrine()->getRepository(Activity::class);        
+        $gamesIfExist = $gameRepo->findOneByTwitchCode($twitch_code);
+        if (!empty($gamesIfExist)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * @Route("/demande-passage-a-streamer/", name="isInProcess")
      * 
-     * page permettant d'afficher tous les user en demande de passage à streamer
-     * 
+     * function to show all users waiting for upgrade to streamer type
      */
     public function isInProcess(){
         $session=$this->get('session');
@@ -774,38 +754,11 @@ class MainController extends AbstractController{
         }
     }
 
-
-
-    ///**
-    //* @Route("/admin-maj-streamer", name="updateStreamer")
-    //*/
-    //public function updateStreamer(Request $request){
-    //      $session= $this->get('session');
-
-            //if(!$session->has('account')){
-                //return $this->redirectToRoute('login');
-            //}
-
-            //if($session->has('account')){
-                //$type = $session->get('account')->getType();
-            //if($type!=2){
-                //throw new NotFoundHttpException('accès non autorisé');
-            //}else{
-
-
-                //return $this->render('adminBackend.html.twig');
-        //}
-    //}
-    //}
-
-
-
     /**
      * @Route("/levelUp/{id}/{tokenInProcess}/{result}/", name="levelUp", requirements={"id"="[1-9][0-9]{0,10}", "tokenInProcess"=".{32}", "result"="(accepted|refused)"})
      * 
-     * fonction pour valider ou non le passage à streamer d'un viewer
+     * function to accept or not the upgrade of the type viewer 2 streamer
      */
-
     public function levelUp($id, $tokenInProcess, $result,  Swift_Mailer $mailer ){
         $session=$this->get('session');
         if(!$session->has('account') || $session->get('account')->getType()!=2){
@@ -892,10 +845,9 @@ class MainController extends AbstractController{
                     ));
                 }
             }
-
         }
-
     }
+
     /**
      * @Route("/record-favorite/", name="recordFavorite")
      */
@@ -913,10 +865,11 @@ class MainController extends AbstractController{
         }
 
     }
+
     /**
      * @Route("/updateStreamer/", name="updateStreamer")
      * 
-     * fonction pour l'ajax dans levelUp pour hydrater un user qui passe à streamer avec les données venant de l'API twitch
+     * function for AJAX in levelUp for hydrating a user (with info from twitch API) once upgraded to streamer
      */
     public function updateStreamer(Request $request){
         $session=$this->get('session');
@@ -932,12 +885,9 @@ class MainController extends AbstractController{
                 $user->setTwitchId($twitchId)->setProfilImage($link);
                 $um = $this->getDoctrine()->getManager()->flush();
                 return $this->json(["success" => true]);
-
-                
             }else{
                 return $this->json(['error' =>true]);
             }
         }
     }
 }
-
