@@ -181,7 +181,6 @@ class MainController extends AbstractController{
                             ->setInProcess(0)
 
                         ;
-                        dump($user);
                         //récupération du manageur des entités
                         $em = $this->getDoctrine()->getManager();
                         $em->persist($user);
@@ -276,8 +275,6 @@ class MainController extends AbstractController{
                 ];
 
             }
-            dump($events);
-            dump($eventsArray);
             return $this->json($eventsArray);
         }
     }
@@ -347,7 +344,6 @@ class MainController extends AbstractController{
                     ];
                 };
             }
-            dump($eventsUsers);
             return $this->json($eventsUsers);
         }
     }
@@ -391,8 +387,6 @@ class MainController extends AbstractController{
                 $event = new Event();
                 $startD = new DateTime($start);
                 $endD = new DateTime($end);
-                dump($color);
-                dump($endD);
                 $event
                     ->setTitle($title)
                     ->setDescription($description)
@@ -428,7 +422,6 @@ class MainController extends AbstractController{
             $end= new DateTime($request->request->get('end'));
             $er= $this->getDoctrine()->getRepository(Event::class);
             $event = $er->findOneById($publicId);
-            dump($event);
             $event->setStart($start)->setEnd($end);
 
             $em= $this->getDoctrine()->getManager();
@@ -478,8 +471,6 @@ class MainController extends AbstractController{
             $publicId = $request->request->get('publicId');
             $er=$this->getDoctrine()->getRepository(Event::class);
             $event=$er->findOneById($publicId);
-            dump($publicId);
-            dump($event);
             $em = $this->getDoctrine()->getManager();
             $em->remove($event);
             $em->flush();
@@ -515,7 +506,6 @@ class MainController extends AbstractController{
         if(!$session->has('account')){
             return $this->redirectToRoute('login');
         }
-        dump($session);
         //listing out all variables
         if ($request->isMethod('post')) {
             $name = $request->request->get('name');
@@ -570,7 +560,6 @@ class MainController extends AbstractController{
         $listStreamer = $user->getFavorite();
         if($request->isMethod('GET')){
             $checkList = $request->query->get("notFollowed");
-            dump($checkList);
             if(!empty($checkList)){
                 foreach($checkList as $check){
                     $streamerToDelete = $er->findOneByName($check);
@@ -599,8 +588,6 @@ class MainController extends AbstractController{
                     
                     $user->addFavorite($str);
                     $em->flush();
-                    dump($user);
-                    dump($str);
                     return $this->render('viewerFavStream.html.twig', ['success'=>true, 'streamerList' => $list, "myFavStreamer" => $listStreamer]);
                 } else {
                     $errors['notexist']=true;
@@ -627,7 +614,6 @@ class MainController extends AbstractController{
         $em = $this->getDoctrine()->getManager();
         $user = $this->get('session')->get('account');
         $user = $em->merge($user);              // we fetch the connected user
-        dump($user);
         $user->setInProcess('1');
         $user->setTokenInProcess(md5(rand()));
         $em->flush();
@@ -659,16 +645,12 @@ class MainController extends AbstractController{
             foreach($activities as $activity){
                 $activityList[]=$activity->getName();
             }
-            dump($activityList);
-            dump($user->getProfilImage());
             if($request->isMethod('POST')){
                 //enregistrement de l'activité choisie dans la page profil
                 $activityChosen = $request->request->get('activity');
-                dump($activityChosen);
                 //verif de $activityChosen dans activityList à faire!!!!!!!!
                 if(!isset($errors)){
                     $activityRegistered = $ar->findOneByName($activityChosen);
-                    dump($activityRegistered);
                     $user->addActivity($activityRegistered);
                     $um->flush();
                 }
@@ -714,7 +696,6 @@ class MainController extends AbstractController{
     * @Route("/admin-maj-game/", name="updateGames")
     */
     public function updateGames(Request $request){
-
 
             //vérification si déjà connecté
         $session= $this->get('session');
@@ -828,7 +809,6 @@ class MainController extends AbstractController{
     public function levelUp($id, $tokenInProcess, $result,  Swift_Mailer $mailer ){
         $session=$this->get('session');
         if(!$session->has('account') || $session->get('account')->getType()!=2){
-            dump($session->get('account')->getType());
             throw new NotFoundHttpException('non autorisé'); 
         }else{
             if($result == "refused"){
@@ -941,7 +921,6 @@ class MainController extends AbstractController{
     public function updateStreamer(Request $request){
         $session=$this->get('session');
         if(!$session->has('account') || $session->get('account')->getType()!=2){
-            dump($session->get('account')->getType());
             throw new NotFoundHttpException('non autorisé'); 
         }else{
             if($request->isMethod('post')){
@@ -950,9 +929,6 @@ class MainController extends AbstractController{
                 $link = $request->request->get('link');
                 $ur=$this->getDoctrine()->getRepository(User::class);
                 $user = $ur->findOneByName($name);
-                dump($user);
-                dump($link);
-                dump($twitchId);
                 $user->setTwitchId($twitchId)->setProfilImage($link);
                 $um = $this->getDoctrine()->getManager()->flush();
                 return $this->json(["success" => true]);
