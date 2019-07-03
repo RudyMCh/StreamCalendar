@@ -11,7 +11,7 @@ $(function(){
         locale: 'fr',
         handleWindowResize: true,
         height: 600,
-        contentHeight: 500,
+        contentHeight: 550,
         footer: true,
         selectable:true,
         allDaySlot: false,
@@ -34,7 +34,6 @@ $(function(){
               return '<p>dimanche </>' + date.getDate();
             }
           },
-        
         header: {
             left: 'prev,next today',
             center: 'title',
@@ -49,27 +48,20 @@ $(function(){
                 container: 'body'
             });
         },
-        loading: function(isLoading, view){
-          if(isLoading){
-            console.log("loading");
-            //setOverlay();
-          }else{
-            console.log("fini de loading");
-            //removeOverlay();
-          }
-        },
+        // loading: function(isLoading, view){
+        //   if(isLoading){
+        //     console.log("loading");
+        //     //setOverlay();
+        //   }else{
+        //     console.log("fini de loading");
+        //     //removeOverlay();
+        //   }
+        // },
         events:{
           url: extractFavoritesEvents
         },
         timeZone: 'UTC',
         themeSystem: 'bootstrap',
-        
-        
-        eventClick: function(info){
-          console.log(info);
-            console.log(info.event._def.title);
-            console.log(info.event._def.extendedProps.description);
-        }
     });
     calendar.render();
 });

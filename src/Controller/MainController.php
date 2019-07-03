@@ -405,7 +405,6 @@ class MainController extends AbstractController{
             $end= new DateTime($request->request->get('end'));
             $er= $this->getDoctrine()->getRepository(Event::class);
             $event = $er->findOneById($publicId);
-            dump($event);
             $event->setStart($start)->setEnd($end);
             $em= $this->getDoctrine()->getManager();
             $em->flush();
@@ -770,7 +769,6 @@ class MainController extends AbstractController{
     public function levelUp($id, $tokenInProcess, $result,  Swift_Mailer $mailer ){
         $session=$this->get('session');
         if(!$session->has('account') || $session->get('account')->getType()!=2){
-            dump($session->get('account')->getType());
             throw new NotFoundHttpException('non autorisé'); 
         }else{
             if($result == "refused"){
@@ -883,7 +881,6 @@ class MainController extends AbstractController{
     public function updateStreamer(Request $request){
         $session=$this->get('session');
         if(!$session->has('account') || $session->get('account')->getType()!=2){
-            dump($session->get('account')->getType());
             throw new NotFoundHttpException('non autorisé'); 
         }else{
             if($request->isMethod('post')){
@@ -892,9 +889,6 @@ class MainController extends AbstractController{
                 $link = $request->request->get('link');
                 $ur=$this->getDoctrine()->getRepository(User::class);
                 $user = $ur->findOneByName($name);
-                dump($user);
-                dump($link);
-                dump($twitchId);
                 $user->setTwitchId($twitchId)->setProfilImage($link);
                 $um = $this->getDoctrine()->getManager()->flush();
                 return $this->json(["success" => true]);

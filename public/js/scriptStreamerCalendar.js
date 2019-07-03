@@ -35,7 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
         themeSystem: "bootstrap",
         handleWindowResize: true,
         height: 600,
-        contentHeight: 500,
+        contentHeight: 550,
+        dayNumber: true,
         footer: true,
         editable:true,
         selectable:true,
@@ -90,13 +91,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(data.success){
                         $('.tooltip').remove();
                         calendar.refetchEvents();
-                        $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded  col-12 col-md-2 success text-white text-center">évènement déplacé avec succès</p>');
+                        $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded  col-12 col-md-2 success text-white text-center"><i class="fas fa-check"></i> évènement déplacé avec succès</p>');
                         setTimeout(function(){
                             $('.success').remove();
                         }, 4000);
                     }
                     if(data.error){
-                        $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="col-12 col-md-2 error text-white text-center">problème rencontré</p>');
+                        $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="col-12 col-md-2 error text-white text-center"><i class="fas fa-exclamation-circle"></i> problème rencontré</p>');
                         setTimeout(function(){
                             $('.success').remove();
                         }, 4000);
@@ -114,14 +115,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(data.success){
                         $('.tooltip').remove();
                         calendar.refetchEvents();
-                        $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mb-3 mx-auto col-12 col-md-2 success text-white text-center">évènement modifié avec succès</p>');
+                        $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mb-3 mx-auto col-12 col-md-2 success text-white text-center"><i class="fas fa-check"></i> évènement modifié avec succès</p>');
                         setTimeout(function(){
                             $('.success').remove();
                         }, 4000);
 
 
                     }else{
-                        $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">problème rencontré</p>');
+                        $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center"><i class="fas fa-exclamation-circle"></i> problème rencontré</p>');
                         setTimeout(function(){
                             $('.error').remove();
                         }, 4000);
@@ -168,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 
                 if($title.length ==0){
-                    $($title).after('<p class="bg-danger error text-white text-center"></p>le champs titre ne peut pas être vide</p>')
+                    $($title).after('<p class="bg-danger error text-white text-center"></p><i class="fas fa-exclamation-circle"></i> le champs titre ne peut pas être vide</p>')
                 }
                 if($('.error').length == 0){
                     //if no error, we perform AJAX quiry to handle the form
@@ -179,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         data: $form.serialize(),
                         success: function(data){
                             if(data.success){
-                                $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement créé avec succès</p>');
+                                $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center"><i class="fas fa-check"></i> évènement créé avec succès</p>');
                                 $('#myModal1').remove();
                                 setTimeout(function(){
                                     $('.success').remove();
@@ -188,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 calendar.refetchEvents();
                             }else{
                                 $('#myModal1').remove();
-                                $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center">ce jeux ne fait pas parti de vos activités</p>');
+                                $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center"><i class="fas fa-exclamation-circle"></i> ce jeux ne fait pas parti de vos activités</p>');
                                 setTimeout(function(){
                                     $('.error').remove();
                                 }, 4000);
@@ -224,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     data:{publicId: info.event._def.publicId},
                     success: function(data){
                         if(data.success){
-                            $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center">évènement supprimé avec succès</p>');
+                            $('.navbar').after('<p style="background-color: rgba(114, 124, 113, 0.8); position: absolute;" class="rounded mx-auto col-12 col-md-2 success text-white text-center"><i class="fas fa-check"></i> évènement supprimé avec succès</p>');
                             $('#myModal2').remove();
                             setTimeout(function(){
                                 $('.success').remove();
