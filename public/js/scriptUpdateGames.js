@@ -16,7 +16,7 @@ function removeOverlay(){
     $('.overlay').remove();
 }
 
-// Function to escape HTML metacharacters (same as PHP htmlspecialchars function)
+// Function to escape HTML metacharacters (actually this function deletes the metachars from a string)
 function escapeHtml(text) {
     var text1=text.toString();
     var text2=text1.replace(/[&<>"']/g, '');
@@ -35,17 +35,34 @@ function sendPost(gcode,gname,gpic){
     setOverlay();
     $.ajax({
         type: 'POST',
-        url: targetUpdateGames,
+        url: targetsendResp,
         dataType: 'json',
         data: {id: gcode, name: gname, pic: gpic},
         success: function(data) {
-            document.location.reload(true);
-            return true;
+            if (typeof (data.success)!='undefined') {
+                if (data.success==true) {
+                    console.log(data.success);
+                $('#infoResult').append(`
+                <h4 class="text-center mt-2 mb-4">Jeu ajouté</h4>
+                `);
+                }
+            }
+            if (typeof(data.errors)!='undefined') {
+                console.log(data.errors);
+                if (data.errors.AlreadyExist==true) {
+                    $('#infoResult').append(`
+                    <h4 class="text-center mt-2 mb-4">Ce jeu est déjà en base</h4>
+                    `);
+                }
+            }
         },
-        // we reload the page so the game list is updated (registered games won't appear anymore)
+        // once completed then we reload the page for updating the game list (registered games won't appear anymore)
         complete: function() {
-            removeOverlay();
-            document.location.reload(true);
+            // we wait for a few seconds so the user have time enough for reading the success message
+            setTimeout(function(){
+                removeOverlay(); // anyway we keep the overlay till the end to prevent the user to add another game too quickly
+                document.location.reload(true); // we reload the page after the few seconds
+            }, 3000);
         }
     });
 }
@@ -63,7 +80,6 @@ $.ajax({
         'Client-ID': '04zu3b1v2s1h7dpk5m4om1q6mgck5s'
     },
     success: function(data){
-        // console.log(data);
         // call function to prepare location where to display request response
         initView();
         data.data.forEach(function(game){ // we display results using bootstrap cards feature
@@ -76,7 +92,6 @@ $.ajax({
                     return;
                 }
             });
-
             if (alreadyIs==false){
                 $('#infoGames').after(`
                 <div class="card mb-3 col-2 text-center">
@@ -88,7 +103,6 @@ $.ajax({
                     </div>
                 </div>`);
             }
-
         });    
     },
     complete: function(){

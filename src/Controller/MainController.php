@@ -267,10 +267,7 @@ class MainController extends AbstractController{
                     'streamer' => $event->getStreamer()->getId(),
                     'color' => $event->getColor()
                 ];
-
             }
-            dump($events);
-            dump($eventsArray);
             return $this->json($eventsArray);
         }
     }
@@ -647,22 +644,22 @@ class MainController extends AbstractController{
      */
     public function adminBackend(Request $request, Swift_Mailer $mailer){
         //we check whether or not we are already connected
-            $session = $this->get('session');
-            if(!$session->has('account')){
-                return $this->redirectToRoute('login');
-            }
-
-            if($session->has('account')){
-                $type = $session->get('account')->getType();
-                if($type!=2){
-                    throw new NotFoundHttpException('accès non autorisé');
-                }else{
-                    return $this->render('adminBackend.html.twig');
-                }
-            }
-            return $this->render('adminBackend.html.twig');
+        $session = $this->get('session');
+        if(!$session->has('account')){
+            return $this->redirectToRoute('login');
         }
-    
+
+        if($session->has('account')){
+            $type = $session->get('account')->getType();
+            if($type!=2){
+                throw new NotFoundHttpException('accès non autorisé');
+            }else{
+                return $this->render('adminBackend.html.twig');
+            }
+        }
+        return $this->render('adminBackend.html.twig');
+    }
+
     /**
     * @Route("/admin-maj-game/", name="updateGames")
     */
@@ -677,9 +674,18 @@ class MainController extends AbstractController{
             throw new NotFoundHttpException('accès non autorisé');
         }
         $gameRepo = $this->getDoctrine()->getRepository(Activity::class);        
-        $gList = $gameRepo->findAllTwitchCode();
-        $gList = json_encode($gList);
+        $gList = $gameRepo->findAllTwitchCode(); // contains the list of all twitch_code already recorded in the database
+        $gList=json_encode($gList);
+        return $this->render('updateGames.html.twig', ['gList' => $gList]); // we send gList to the view
+    }
 
+    /**
+     * @Route("/send-response/", name="sendResp")
+     * 
+     * function to send a response
+     * used by updateGames to send feedback to AJAX quiry
+    */
+    public function sendResp(Request $request){
         // we check out the data from POST if any
         if($request->isMethod('post')){
             // we fetch the data
@@ -712,13 +718,12 @@ class MainController extends AbstractController{
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($newGame);
                 $em->flush(); // new game is successfully saved in the database
-                $gList = $gameRepo->findAllTwitchCode(); // contains the list of all twitch_code already recorded in the database
-                $gList=json_encode($gList);
-                return $this->render('updateGames.html.twig', ['gList' => $gList]); // we pass gList to the view
+                //we return success message using JSON format
+                return $this->json(["success" => true]);
+            }else{
+                return $this->json(["errors" => $errors]);
             }
-            return $this->render('updateGames.html.twig', ['errors' => $errors]); // actually errors is now useless and needs further treatment for being processed in the view
         }
-        return $this->render('updateGames.html.twig', ['gList' => $gList]); 
     }
 
     /**

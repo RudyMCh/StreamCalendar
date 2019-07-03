@@ -5,8 +5,8 @@
 
     <div class="container-fluid">
         <div class="row">
-            <div class="mx-auto">
-                <h4 class="text-center mt-2 mb-4">Merci de patienter pendant le traitement</h4>
+            <div class="mx-auto" id="infoResult" style="min-height:80px;">
+                {#<h4  advice user whether or not game has been successfully saved in database #}
             </div>
         </div>
         <div class="row">
@@ -22,6 +22,7 @@
     var gL3=gL2.replace(/&quot;/g,'"');
     var gL4= gL3.replace(/"twitch_code":/g,'');
     var gList=JSON.parse(gL4); // we finaly get it back into an array
+    var targetsendResp = '{{ url('sendResp') }}';
 </script>
 <script src="{{ asset('js/scriptUpdateGames.js') }}"></script>
 <script>
