@@ -618,15 +618,24 @@ class MainController extends AbstractController{
                 $activityList[]=$activity->getName();
             }
             if($request->isMethod('POST')){
+
                 //we save the activity selected in the profile page
+ 
                 $activityChosen = $request->request->get('activity');
-                dump($activityChosen);
-                // need to do further verification for $activityChosen from activityList !!!!!!!!
-                if(!isset($errors)){
+ 
+                if(!empty($activityChosen)){
+ 
                     $activityRegistered = $ar->findOneByName($activityChosen);
+ 
                     $user->addActivity($activityRegistered);
+ 
                     $um->flush();
+                    
+                }else{
+                    $errors['notexist']=true;
+                   
                 }
+               
             }
         }
         return $this->render('streamerProfil.html.twig', array(

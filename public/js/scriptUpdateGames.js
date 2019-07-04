@@ -94,12 +94,12 @@ $.ajax({
             });
             if (alreadyIs==false){
                 $('#infoGames').after(`
-                <div class="card mb-3 col-2 text-center">
+                <div class="card mb-3 col-10 col-sm-6 col-md-4 col-lg-3 col-xl-3 text-center">
                     <img class="card-img-top " src="` + escapeHtml(resize(game.box_art_url)) + `" alt="Card image cap">
                     <div class="card-body">
                         <h5 class="card-title">`+ escapeHtml(game.name) +`</h5>
                         <p class="card-text">`+escapeHtml(game.id)+`</p>
-                        <a href="#" class="btn btn-primary" onclick="sendPost('`+escapeHtml(game.id)+`','`+escapeHtml(game.name)+`','`+escapeHtml(game.box_art_url)+`')">Ajouter ce jeu en base de données</a>
+                        <a href="#" class="btn btn-primary mb-3 col-10 col-sm-6 col-md-6 col-lg-6 col-xl-6 text-center" onclick="sendPost('`+escapeHtml(game.id)+`','`+escapeHtml(game.name)+`','`+escapeHtml(game.box_art_url)+`')">Ajouter ce jeu en base de données</a>
                     </div>
                 </div>`);
             }
