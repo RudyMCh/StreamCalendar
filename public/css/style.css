@@ -1,6 +1,7 @@
 body{
     background-color: rgb(202, 211, 214);
 }
+
 /* set an overlay onto the current page while performing AJAX function */
 .overlay{
   position:absolute;
@@ -196,7 +197,6 @@ h1{
 style for the calendar*/
 
 
-
 /* The Modal (background) */
 .modal {
     display: block; /* Hidden by default */
@@ -278,9 +278,11 @@ table .table-bordered{
 
   /*-----------CSS index-------------------------*/
   .slide1 {
+    margin:0;
+   padding:0;
     width:100%;
     height:100%;
-   min-height: 35em;
+    min-height: 35em;
     background: url("../img/apex-legends_0640038401658422.jpg") center 0 no-repeat fixed;
     -webkit-background-size: cover;
     background-size: cover;
@@ -288,8 +290,8 @@ table .table-bordered{
  .slide3 {
     margin:0;
    padding:0;
-   width:100%;
-   min-height: 30em;
+   height:100%;
+   width:96%;
     background: url("../img/apex-legends_0640038401658422.jpg") center 0 no-repeat fixed;
     -webkit-background-size: cover;
     background-size: cover;
@@ -299,7 +301,6 @@ table .table-bordered{
  .flip-box {
     background-color: transparent;
     width: 100%;
-    height: 10%;
    /* Remove perspective this if you dont't want the 3D effect */
     perspective: 2500px; 
     min-width: 10%;
@@ -310,7 +311,7 @@ table .table-bordered{
   .flip-box-inner {
     position: relative;
     text-align: center;
-    transition: transform 0.8s;
+    transition: transform 0.7s;
     transform-style: preserve-3d;
   }
   
