@@ -519,8 +519,7 @@ class MainController extends AbstractController{
         }
         return $this->render('viewerProfile.html.twig');
     }
-
-    /**
+/**
      * @Route("/viewer-favoris-streamers/", name="viewerFavStream")
      * page for managing the favorites streamers
      */
@@ -564,20 +563,21 @@ class MainController extends AbstractController{
                 if (!empty($str)) {
                     $user->addFavorite($str);
                     $em->flush();
-                    return $this->render('viewerFavStream.html.twig', ['success'=>true, 'streamerList' => $list, "myFavStreamer" => $listStreamer]);
+                    return $this->render('viewerFavStream.html.twig', ['success'=>true, "streamers" => $streamers, 'streamerList' => $list, "myFavStreamer" => $listStreamer]);
                 } else {
                     $errors['notexist']=true;
-                    return $this->render('viewerFavStream.html.twig', ['errors'=> $errors, 'streamerList' => $list, "myFavStreamer" => $listStreamer]);
+                    return $this->render('viewerFavStream.html.twig', ['errors'=> $errors, "streamers" => $streamers, 'streamerList' => $list, "myFavStreamer" => $listStreamer]);
                 }
             }
             if(isset($errors)){
-                return $this->render('viewerFavStream.html.twig', array('errors' => $errors, 'streamerList' => $list, "myFavStreamer" => $listStreamer));
+                return $this->render('viewerFavStream.html.twig', array('errors' => $errors, "streamers" => $streamers,'streamerList' => $list, "myFavStreamer" => $listStreamer));
             } else {
-                return $this->render('viewerFavStream.html.twig', array("streamerList" => $list, "myFavStreamer" => $listStreamer));
+                return $this->render('viewerFavStream.html.twig', array("streamers" => $streamers,"streamerList" => $list, "myFavStreamer" => $listStreamer));
             }
         }
-        return $this->render('viewerFavStream.html.twig', array("streamerList" => $list, "myFavStreamer" => $listStreamer));
+        return $this->render('viewerFavStream.html.twig', array("streamers" => $streamers,"streamerList" => $list, "myFavStreamer" => $listStreamer));
     }
+ 
     
     /**
      * @Route("/evolution-profil/", name="viewer2streamer")
@@ -618,17 +618,26 @@ class MainController extends AbstractController{
                 $activityList[]=$activity->getName();
             }
             if($request->isMethod('POST')){
+
                 //we save the activity selected in the profile page
+ 
                 $activityChosen = $request->request->get('activity');
-                dump($activityChosen);
-                // need to do further verification for $activityChosen from activityList !!!!!!!!
-                if(!isset($errors)){
+ 
+                if(!empty($activityChosen)){
+
                     $activityRegistered = $ar->findOneByName($activityChosen);
-                    $user->addActivity($activityRegistered);
-                    $um->flush();
+ 
+                    if(!empty($activityRegistered)) {
+ 
+                        $user->addActivity($activityRegistered);
+ 
+                        $um->flush();
+ 
+                    }
+ 
                 }
             }
-        }
+            }
         return $this->render('streamerProfil.html.twig', array(
             "activity" => $user->getActivity(),
             "name" => $user->getName(),

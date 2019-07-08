@@ -94,16 +94,17 @@ $.ajax({
             });
             if (alreadyIs==false){
                 $('#infoGames').after(`
-                <div class="card mb-3 col-10 col-sm-6 col-md-4 col-lg-2 col-xl-1 text-center">
-                    <img class="card-img-top " src="` + escapeHtml(resize(game.box_art_url)) + `" alt="Card image cap">
+                <div class="card mb-3 col-10 col-sm-6 col-md-4 col-lg-2 text-center">
+                    <img class="card-img-top" src=" `+ escapeHtml(resize(game.box_art_url)) +` " alt="Card image cap">
                     <div class="card-body">
-                        <h5 class="card-title">`+ escapeHtml(game.name) +`</h5>
-                        <p class="card-text">`+escapeHtml(game.id)+`</p>
-                        <a href="#" class="btn btn-primary" onclick="sendPost('`+escapeHtml(game.id)+`','`+escapeHtml(game.name)+`','`+escapeHtml(game.box_art_url)+`')">Ajouter ce jeu en base de données</a>
+                        <h5 class="card-title" style="height:60px; overflow:auto">`+ escapeHtml(game.name) +`</h5>
+
+                       <p class="card-text" style="height:30px;">`+escapeHtml(game.id)+`</p>
+                        <a href="#" class="btn btn-primary " onclick="sendPost('`+escapeHtml(game.id)+`','`+escapeHtml(game.name)+`','`+escapeHtml(game.box_art_url)+`')">Ajouter</a>
                     </div>
                 </div>`);
             }
-        });    
+        });
     },
     complete: function(){
         // Once the query is completed then we cancel the overlay
