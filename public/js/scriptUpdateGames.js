@@ -94,7 +94,7 @@ $.ajax({
             });
             if (alreadyIs==false){
                 $('#infoGames').after(`
-                <div class="card mb-3 col-2 text-center">
+                <div class="card mb-3 col-10 col-sm-6 col-md-4 col-lg-2 col-xl-1 text-center">
                     <img class="card-img-top " src="` + escapeHtml(resize(game.box_art_url)) + `" alt="Card image cap">
                     <div class="card-body">
                         <h5 class="card-title">`+ escapeHtml(game.name) +`</h5>
