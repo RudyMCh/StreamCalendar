@@ -30,6 +30,8 @@ class MainController extends AbstractController{
 
     /**
      * @Route("/mon-calendrier/", name="myCalendar")
+     * 
+     * ppage for the streamer, return the list of all his activities
      */
     public function myCalendar()
     {
@@ -70,9 +72,10 @@ class MainController extends AbstractController{
                 $request->isMethod('post')
             )
             {
-                //récupration des données POST
+                //récupération des données POST
                 $email = $request->request->get('email');
                 $password = $request->request->get('password');
+                //checking of the input
                 if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                     $errors['email'] =  true;
                 }
@@ -122,7 +125,7 @@ class MainController extends AbstractController{
     /**
      * @Route("/inscription/", name="register")
      */
-    public function register(Request $request, Swift_Mailer $mailer){
+    public function register(Request $request, Recaptcha $recaptcha, Swift_Mailer $mailer){
         //already connected or not ?
         $session = $this->get('session');
         if($session->has('account')){
@@ -133,7 +136,7 @@ class MainController extends AbstractController{
             $name = $request->request->get('name');           
             $password = $request->request->get('password');
             $confirmPassword = $request->request->get('confirmPassword');
-            //$reCaptcha = $request->request->get('g-recaptcha-response');
+            $reCaptcha = $request->request->get('g-recaptcha-response');
             
             //variables checking list
             if
@@ -141,7 +144,7 @@ class MainController extends AbstractController{
                $request->isMethod('post')
             )
             {
-                //verifications
+                //verifications des input
                 if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                     $errors['email'] =  true;
                 }
@@ -154,9 +157,9 @@ class MainController extends AbstractController{
                 if($password != $confirmPassword){
                     $errors['confirmPassword'] = true;
                 }
-                // if(!$recaptcha->isValid($reCaptcha, $request->server->get('REMOTE_ADDR'))){
-                //     $errors['reCaptcha'] = true;
-                // }
+                if(!$recaptcha->isValid($reCaptcha, $request->server->get('REMOTE_ADDR'))){
+                    $errors['reCaptcha'] = true;
+                }
                 //if no error:
                 if(!isset($errors)){
                     //is email already used ?
@@ -257,7 +260,11 @@ class MainController extends AbstractController{
         if(empty($events)){
             return $this->json(['empty' =>true]);
         }else{  
+            $ar = $this->getDoctrine()->getRepository(Activity::class);
             foreach($events as $event){
+                $activity = $ar->findOneByName($event->getTitle());
+                $color = $activity->getColor();
+                dump($event);
                 $eventsArray[] = [
                     'id' => $event->getId(),
                     'title' => $event->getTitle(),
@@ -265,7 +272,7 @@ class MainController extends AbstractController{
                     'start' => $event->getStart()->format('Y-m-d H:i:s'),
                     'end' => $event->getEnd()->format('Y-m-d H:i:s'),
                     'streamer' => $event->getStreamer()->getId(),
-                    'color' => $event->getColor()
+                    'color' => $color
                 ];
             }
             return $this->json($eventsArray);
@@ -275,6 +282,7 @@ class MainController extends AbstractController{
     /**
      * @Route("/extractStreamer/", name="extractStreamer")
      * 
+     * function to extract streamer
      */
     public function extractStreamer(Request $request){
         $name= $request->request->get('name');
@@ -316,14 +324,17 @@ class MainController extends AbstractController{
         }else{
             $eventsUsers = [];
             $er = $this->getDoctrine()->getRepository(Event::class);
+            $ar = $this->getDoctrine()->getRepository(Activity::class);
             foreach($myStreamers as $streamer){
                 $events=$er->findByStreamer($streamer);
                 foreach($events as $event){
+                    $activity = $ar->findOneByName($event->getTitle());
+                    $color = $activity->getColor();
                     $eventsUsers[] = [
                         'id' => $event->getId(),
                         'title' => $event->getTitle(),
                         'description' => $event->getDescription(),
-                        'color' => $event->getColor(),
+                        'color' => $color,
                         'start' => $event->getStart()->format('Y-m-d H:i:s'),
                         'end' => $event->getEnd()->format('Y-m-d H:i:s'),
                         'streamer' => $event->getStreamer()->getName()
@@ -637,7 +648,17 @@ class MainController extends AbstractController{
  
                 }
             }
+            if($request->isMethod('GET')){
+                $checkList = $request->query->get("notFollowed");
+                if(!empty($checkList)){
+                    foreach($checkList as $check){
+                        $activityToDelete = $ar->findOneByName($check);
+                        $user->removeActivity($activityToDelete);
+                        $um->flush();
+                    }
+                }
             }
+        }
         return $this->render('streamerProfil.html.twig', array(
             "activity" => $user->getActivity(),
             "name" => $user->getName(),
@@ -685,6 +706,43 @@ class MainController extends AbstractController{
         $gList = $gameRepo->findAllTwitchCode(); // contains the list of all twitch_code already recorded in the database
         $gList=json_encode($gList);
         return $this->render('updateGames.html.twig', ['gList' => $gList]); // we send gList to the view
+    }
+
+    /**
+     * @Route("parametres-activites", name="activitiesSettings")
+     */
+    public function activitiesSettings(Request $request)
+    {
+           //we check whether or not already connected
+           $session= $this->get('session');
+           if(!$session->has('account')){
+               return $this->redirectToRoute('login');
+           }
+           $type = $session->get('account')->getType();
+           if($type!=2){
+               throw new NotFoundHttpException('accès non autorisé');
+           }
+
+           $ar = $this->getDoctrine()->getRepository(Activity::class);
+           $activities = $ar->findAll();
+           if($request->isMethod('POST')){
+                $color = $request->request->get('color');
+                if(!preg_match('#^\#[a-f0-9]{6}$#i', $color)){
+                    $errors["color"] = true;
+                }
+                if(!isset($errors)){
+                    $game = $ar->findOneByTwitchCode($request->request->get('twitchCode'));
+                    $game->setColor($color);
+                    $em=$this->getDoctrine()->getManager();
+                    $game=$em->merge($game);
+                    $em->flush();
+                }
+                if(isset($errors)){
+                        return $this->render('activitiesSettings.html.twig', array('activities' => $activities, "errors" => $errors));
+                }
+
+           }
+        return $this->render('activitiesSettings.html.twig', array('activities' => $activities));
     }
 
     /**

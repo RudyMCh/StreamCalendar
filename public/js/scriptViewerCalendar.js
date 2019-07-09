@@ -39,6 +39,7 @@ $(function(){
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
+        //mise en place des tooltips
         eventRender: function(info) {
             var tooltip = new Tooltip(info.el, {
               html: true,
@@ -48,15 +49,6 @@ $(function(){
                 container: 'body'
             });
         },
-        // loading: function(isLoading, view){
-        //   if(isLoading){
-        //     console.log("loading");
-        //     //setOverlay();
-        //   }else{
-        //     console.log("fini de loading");
-        //     //removeOverlay();
-        //   }
-        // },
         events:{
           url: extractFavoritesEvents
         },

@@ -43,10 +43,10 @@
     </div>
     <div class="row">
         {% for streamer in streamers %}
-        <div class="card mb-3 col-10 col-sm-6 col-md-4 col-lg-2 text-center">
-            <img class="card-img-top" src="{{streamer.profilImage}}" alt="Card image cap">
+        <div class="card mb-3 col-10 col-sm-6 col-md-4 col-lg-2 text-center rounded">
+            <img class="card-img-top mt-2" src="{{streamer.profilImage}}" alt="Card image cap">
             <div class="card-body">
-                <h5 class="card-title">{{streamer.name}}</h5>
+                <h5 class="card-title text-black">{{streamer.name}}</h5>
                 <p class="card-text">{{streamer.email}}</p>
                 <p class="card-text">{{streamer.twitchId}}</p>
             </div>
@@ -59,14 +59,8 @@
 
 {% block javascripts %}
     <script src="{{asset('js/script-api.js')}}" type="text/javascript"></script>
-    <script src="{{asset('js/scriptViewerFavStream.js') }}" type="text/javascript"></script>
-    <script>
-        var targetExtract = "{{ url('extract') }}";       
-    </script>
-    
-    
+    <script src="{{asset('js/scriptViewerFavStream.js') }}" type="text/javascript"></script>        
     <script src="{{asset('js/typeahead.bundle.js')}}" type="text/javascript"></script>
-
     <script>
             var streamList= {{streamerList|escape|json_encode|raw}};
 

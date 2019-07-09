@@ -71,14 +71,14 @@
 
 					<!-- session Administration adminBackend -->
 					{% if app.session.has('account') and app.session.get('account').type == 2 %}
-					<li class="nav-item {% if  way =='adminBackend' %} active bg-success rounded{% endif %}">
-						<a class="nav-link " href="{{ path('adminBackend')}}">Administration</a>
-					</li>
 					<li class="nav-item {% if  way =='isInProcess' %} active bg-success rounded{% endif %}">
 						<a class="nav-link " href="{{ path('isInProcess')}}">passage Streamer</a>
 					</li>
 					<li class="nav-item {% if  way =='updateGames' %} active bg-success rounded{% endif %}">
 						<a class="nav-link" href="{{ path('updateGames')}}">Update Games</a>
+					</li>
+					<li class="nav-item {% if  way =='activitiesSettings' %} active bg-success rounded{% endif %}">
+						<a class="nav-link" href="{{ path('activitiesSettings')}}">couleurs de activités</a>
 					</li>
 					{% endif %}
 				</ul>

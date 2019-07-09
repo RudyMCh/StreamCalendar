@@ -1,3 +1,4 @@
+//elements modal pour l'édition d'évênement
 var modalEvent = `
 <div id="myModal2" class="modal col-12">
     <div class="modal-content form-group">
@@ -7,6 +8,7 @@ var modalEvent = `
         </form>
     </div>
 </div>`;
+//elements modal pour l'inscription d'évênements
 var modalNewEvent = `
 <div id="myModal1" class="modal col-12">
     <div class="modal-content">
@@ -24,7 +26,7 @@ var modalNewEvent = `
 
 document.addEventListener('DOMContentLoaded', () => {
     var calendarEl = document.getElementById('streamerCalendar');
-
+    //mise en place d'unn objet fullcalendar
     var calendar = new FullCalendar.Calendar(calendarEl, {
         slotDuration: '01:00:00', /* If we want to split day time each 15minutes */
         minTime: '05:00:00', /* calendar start Timing */
@@ -42,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         selectable:true,
         allDaySlot: false,
         navLink: true,
+        //insertion HTML pour les header de chaque colonne
         columnHeaderHtml: function(date) {
             switch (date.getUTCDay()) {
                 case 1:
@@ -66,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
+        //fonction de mise en place des tooltips pour l'affichage d'informations supplémentaires pour chaque évênement
         eventRender: function(info) {
             var tooltip = new Tooltip(info.el, {
                 html:true,
@@ -75,12 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 container: 'body'
             });
         },
+        //source des évênements sous format json
         events:{
             url : targetExtract
         },
         timeZone: 'UTC',
         themeSystem: 'bootstrap',
-        
+        //fonction pour déplacer les évênements, enregistrement des nouvelles coordonnées DateTime en bdd par une fonction AJAX
         eventDrop: function(info){
             $.ajax({
                 type: "POST",
@@ -104,7 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 },
             })
-        },       
+        },
+        //fonction pour changer la find'un évênement, enregistrement des nouvelles coordonnées DateTime en bdd par une fonction AJAX
         eventResize: function(info){
             $.ajax({
                 type: "POST",
@@ -130,16 +136,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 }, error: function(data){
                     if(data.error){
+                        $('.navbar').after('<p style="background-color: rgba(224, 100, 100, 0.8);position: absolute;" class="mx-auto col-12 col-md-2 error text-white text-center"><i class="fas fa-exclamation-circle"></i> problème rencontré lors de l\'enregistrement</p>');
+                        setTimeout(function(){
+                            $('.error').remove();
+                        }, 4000);
                     }
                 }
             })
         },
+        //fonction qui permet de sélectionner un un moment dans le calendrier pour créer un évênement
         select: function(info){
             $('.error').remove();
             $('p.success').remove();
             //add a listener on the div modalPlace and create a modal form
             var $modal = $('#modalPlace');
             $modal.append(modalNewEvent);
+            //fonction d'autosuggestion pour un remplissage rapide du champs à remplir
             var activity = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.whitespace,
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -156,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     name: 'activity',
                     source: activity
                 });
-        
+            //fermeture du modal
             $('#close1').click(function(){
                 $('#myModal1').remove();
             });
@@ -207,7 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             })
         },
+        //fonction pour éditer un évênement, et pour pouvoir le supprimer
         eventClick: function(info){
+            console.log(info);
             var $modal = $('#modalPlace');
             $modal.append(modalEvent);
             $('#myModal2').css('display', 'block');

@@ -48,6 +48,10 @@
                         {% if errors.errorMail is defined %}
                             <p class="bg-danger text-white rounded text-center">erreur lors de l'envoi du mail, réessayez</p>
                         {% endif %}
+                        <div class="g-recaptcha pt-2" data-sitekey="{{ cle_public }}"></div>
+                        {% if errors.reCaptcha is defined %}
+                        <p style="color:red">reCaptcha invalide</p>
+                        {% endif %}
                         <input class="btn btn-primary col-12 col-md-4 mt-2" type="submit" value="Valider">
                     </fieldset>
                 </form>

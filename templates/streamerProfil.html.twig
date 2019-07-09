@@ -19,11 +19,18 @@
                 </div>
                 <div class="text-center">
                     <h2>Mes activités</h2>
-                    <ul>
-                        {% for item in activity %}
-                            <li class="text-left">{{ item.name }}</li>
-                        {% endfor %}
-                    </ul>
+                    {% if activity is defined %}
+            <form action="{{ path('streamerProfil') }}" method="GET">
+                <ul>
+                {% for activityItem in activity %}
+                    <li class="list-unstyled text-left text-white"> {{ activityItem.name }}
+                        <input type="checkbox" class="checkbox" name="notFollowed[]" value="{{ activityItem.name }}">
+                    </li>
+                {% endfor %}
+                </ul>
+                <button type="submit" class="btn btn-primary">ne plus suivre</button>
+            </form>
+            {% endif %}
                 </div>
             </div>
         </div>

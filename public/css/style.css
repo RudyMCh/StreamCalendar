@@ -13,7 +13,7 @@ body{
 }
 /* we aim on titlesh2 to h6 for applying blue color and to center the text with a personalized font police */
 h2, h3, h4, h5, h6{
-    color: blue;
+    color: white;
     font-weight: bold;
     text-align:center;
     font-family: "Endgame";
@@ -436,3 +436,50 @@ table .table-bordered{
   margin-left: 0;
   margin-right: 0;
 }
+
+/*style pour error403*/
+/* 
+.image1 {
+	text-align: center;
+	margin-left: 43%;
+	margin-right: 43%;
+	margin-top: 10%;
+	
+}
+
+
+#test{
+    animation: Test 1s infinite;
+}
+
+@keyframes Test{
+    0%{opacity: 1;}
+    50%{opacity: 0;}
+    100%{opacity: 1;}
+}
+/* span {text-decoration: blink;} */
+
+/* .image2 {
+	margin-left: 43%;
+	margin-right: 43%;
+} */ 
+
+/*404*/
+ /* .image1{
+	text-align: center;
+	margin-left: 28%;
+	margin-right: 28%;
+	margin-top: 0%;
+	color: green;
+	width: 800px;
+	height: 450px;
+} */
+
+/* h2  {
+	text-align: center;
+	margin-left: 38%;
+	margin-right: 38%;
+	margin-top: 5px;
+	margin-bottom: 5%;
+	color: blue;
+} */
